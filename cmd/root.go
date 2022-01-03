@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"mcmods/mc"
 	"os"
@@ -17,6 +18,9 @@ var (
 	InstallConfig *mc.ClientModConfig
 	serverName    = "[SERVER]"
 	ViperInstance = viper.GetViper()
+
+	Version      string
+	printVersion *bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -28,6 +32,13 @@ This tool installs and updates mods on a machine for connecting to.
 a Minecraft server. The server is private, and only available by
 invite. To inquire about an invite, please call 1-888-PISS-OFF and
 ask for Dianne.`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if *printVersion {
+			fmt.Println(Version)
+			return nil
+		}
+		return errors.New("no arguments specified")
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -40,6 +51,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mcmods.yaml)")
+
+	printVersion = RootCmd.Flags().BoolP("version", "v", false, "Show the version of this tool")
 }
 
 // initConfig reads in config file and ENV variables if set.

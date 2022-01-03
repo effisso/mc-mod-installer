@@ -15,8 +15,15 @@ limitations under the License.
 */
 package main
 
-import "mcmods/cmd"
+import (
+	_ "embed"
+	"mcmods/cmd"
+)
+
+//go:embed VERSION.txt
+var version string
 
 func main() {
+	cmd.Version = version
 	cmd.Execute()
 }

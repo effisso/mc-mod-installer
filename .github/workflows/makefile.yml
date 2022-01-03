@@ -18,5 +18,70 @@ jobs:
       with:
         go-version: 1.17
 
-    - name: make
-      run: make
+    - name: build binaries
+      run: make build-release
+
+    - name: version
+      run: echo "::set-output name=version::$(./out/linux-arm/mcmods --version)"
+      id: version
+    
+    - name: release
+      uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+    - name: upload linux arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-linux-arm.tar.gz
+        asset_name: mcmods-linux-arm.tar.gz
+        asset_content_type: application/gzip
+        
+    - name: upload linux amd
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-linux-amd.tar.gz
+        asset_name: mcmods-linux-amd.tar.gz
+        asset_content_type: application/gzip
+
+    - name: upload darwin arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-darwin-arm.tar.gz
+        asset_name: mcmods-darwin-arm.tar.gz
+        asset_content_type: application/gzip
+
+    - name: upload darwin amd
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-darwin-amd.tar.gz
+        asset_name: mcmods-darwin-amd.tar.gz
+        asset_content_type: application/gzip
+
+    - name: upload windows
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-windows.zip
+        asset_name: mcmods-windows.zip
+        asset_content_type: application/zip
