@@ -3,8 +3,6 @@ name: Release
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -43,7 +41,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-linux-arm.tar.gz
-        asset_name: mcmods-linux-arm.tar.gz
+        asset_name: mcmods-linux-arm-${{ steps.version.outputs.version }}.tar.gz
         asset_content_type: application/gzip
         
     - name: upload linux amd
@@ -53,7 +51,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-linux-amd.tar.gz
-        asset_name: mcmods-linux-amd.tar.gz
+        asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
         asset_content_type: application/gzip
 
     - name: upload mac arm
@@ -63,7 +61,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-mac-arm.tar.gz
-        asset_name: mcmods-mac-arm.tar.gz
+        asset_name: mcmods-mac-arm-${{ steps.version.outputs.version }}.tar.gz
         asset_content_type: application/gzip
 
     - name: upload mac amd
@@ -73,7 +71,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-mac-amd.tar.gz
-        asset_name: mcmods-mac-amd.tar.gz
+        asset_name: mcmods-mac-amd-${{ steps.version.outputs.version }}.tar.gz
         asset_content_type: application/gzip
 
     - name: upload windows
@@ -83,5 +81,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-windows.zip
-        asset_name: mcmods-windows.zip
+        asset_name: mcmods-windows-${{ steps.version.outputs.version }}.zip
         asset_content_type: application/zip
