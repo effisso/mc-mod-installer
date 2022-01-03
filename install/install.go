@@ -1,5 +1,0 @@
-package install
-
-func Install() {
-
-}

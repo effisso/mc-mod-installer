@@ -1,0 +1,29 @@
+{
+    "required": {
+        "description": "Mods that are required for clients to play on the server.",
+        "mods": [
+            {
+                "friendlyName": "Ducts",
+                "cliName": "ducts",
+                "description": "Transport items between entity blocks with significantly better performance than hopper chains.",
+                "detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/ducts",
+                "latestUrl": "https://www.curseforge.com/minecraft/mc-mods/ducts/download/3571121/file"
+            }
+        ]
+    },
+    "server-only": {
+        "description": "Mods that should only be installed on the server. These don't make sense to be installed on client machines.",
+        "mods": [
+        ]
+    },
+    "optional": {
+        "description": "Mods which are installed on the server, but are optional on the client. They are recommended for feature responsiveness.",
+        "mods": [
+        ]
+    },
+    "performance": {
+        "description": "Mods that are not required, but are recommended for general performance improvements. Their default configuration should be fine for those not wishing to configure things.",
+        "mods": [
+        ]
+    }
+}
