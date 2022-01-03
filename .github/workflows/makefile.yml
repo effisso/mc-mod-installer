@@ -22,7 +22,7 @@ jobs:
       run: make build-release
 
     - name: version
-      run: echo "::set-output name=version::$(./out/linux-arm/mcmods --version)"
+      run: echo "::set-output name=version::$(cat VERSION.txt)"
       id: version
     
     - name: release
