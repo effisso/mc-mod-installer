@@ -33,5 +33,5 @@ zip:
 	zip -r ${OUT_FOLDER}/${BINARY_NAME}-windows.zip ${OUT_FOLDER}/win/${BINARY_NAME}.exe
 	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-arm.tar.gz ${OUT_FOLDER}/linux-arm/${BINARY_NAME}
 	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-amd.tar.gz ${OUT_FOLDER}/linux-amd/${BINARY_NAME}
-	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-arm.targ.gz ${OUT_FOLDER}/mac-arm/${BINARY_NAME}
-	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-amd.targ.gz ${OUT_FOLDER}/mac-amd/${BINARY_NAME}
+	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-arm.tar.gz ${OUT_FOLDER}/mac-arm/${BINARY_NAME}
+	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-amd.tar.gz ${OUT_FOLDER}/mac-amd/${BINARY_NAME}
