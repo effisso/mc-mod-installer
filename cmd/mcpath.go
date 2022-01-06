@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	path = newStrPtr()
+	path *string
 )
 
 // pathCmd represents the loc command
 var pathCmd = &cobra.Command{
-	Use:   "path",
+	Use:   "mcpath",
 	Short: "Get and set the path to the Minecraft install folder",
 	Long: `
 Mods must be installed in a specific place inside the Minecraft installation
@@ -21,10 +21,10 @@ machine.
 
 To print the location, call this command with no args. To set the path, use the
 --set option:
- $ path --set /absolute/path/to/.minecraft`,
+ $ mcpath --set /absolute/path/to/.minecraft`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		if *path == "" {
-			printToUser(ViperInstance.GetString(mc.InstallPathKey))
+			printToUser(mc.GetInstallPath())
 		} else {
 			ViperInstance.Set(mc.InstallPathKey, path)
 			err = ViperInstance.WriteConfig()
@@ -36,8 +36,15 @@ To print the location, call this command with no args. To set the path, use the
 	},
 }
 
+// ResetPathVars is used for testing
+func ResetPathVars() {
+	*path = ""
+}
+
 func init() {
+	ResetAddVars()
+
 	RootCmd.AddCommand(pathCmd)
 
-	pathCmd.Flags().StringVar(path, "set", "", "Used to set the path where Minecraft is installed: --set /path/to/folder")
+	path = pathCmd.Flags().String("set", "", "Used to set the path where Minecraft is installed: --set /path/to/folder")
 }
