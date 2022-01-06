@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"path/filepath"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -40,43 +41,50 @@ var _ = Describe("Downloader", func() {
 	})
 
 	Context("download func", func() {
+		var fs afero.Fs
+		var mcfs *mc.LocalFileSystem
 		var dl mc.ModDownloader
 		var rc io.ReadCloser
 
-		filePath := "/some/path/to/a.jar"
+		mcInstallPath := "/root/folder/.minecraft"
+		relFilePath := "some/path/to/a.jar"
+		fullPath := filepath.Join(mcInstallPath, relFilePath)
 		content := "test"
 
 		BeforeEach(func() {
-			dl = mc.NewModDownloader()
-			mc.FileSystem = afero.NewMemMapFs()
+			mc.ViperInstance.Set(mc.InstallPathKey, mcInstallPath)
+
+			fs = afero.NewMemMapFs()
+			mcfs = &mc.LocalFileSystem{Fs: fs}
+			dl = mc.NewModDownloader(mcfs)
 			rc = io.NopCloser(strings.NewReader(content))
 		})
 
 		It("creates directories if not present, writes file contents", func() {
 			mc.Http.Getter = emptyGetter{Res: &http.Response{Body: rc}}
 
-			err := dl.Download(TestingClientMod1, filePath)
+			err := dl.Download(TestingClientMod1, relFilePath)
 
 			Expect(err).To(BeNil())
 
-			exists, _ := afero.Exists(mc.FileSystem, filePath)
+			exists, _ := afero.Exists(fs, fullPath)
 			Expect(exists).To(BeTrue())
 
-			b, _ := afero.ReadFile(mc.FileSystem, filePath)
+			b, _ := afero.ReadFile(fs, fullPath)
 			Expect(string(b)).To(Equal(content))
 		})
 
 		It("doesn't download if dirs can't be created", func() {
 			eg := emptyGetter{Err: errors.New("this error won't be returned")}
-			mc.FileSystem = afero.NewReadOnlyFs(mc.FileSystem)
+			mcfs.Fs = afero.NewReadOnlyFs(fs)
 			mc.Http.Getter = eg
 
-			err := dl.Download(TestingClientMod1, filePath)
+			err := dl.Download(TestingClientMod1, relFilePath)
 
 			Expect(err).To(Not(BeNil()))
 			Expect(err).To(Not(Equal(eg.Err)))
 
-			exists, _ := afero.Exists(mc.FileSystem, filePath)
+			exists, _ := afero.Exists(fs, fullPath)
 			Expect(exists).To(BeFalse())
 		})
 
@@ -84,11 +92,11 @@ var _ = Describe("Downloader", func() {
 			eg := emptyGetter{Err: errors.New("bad url, or something. idk")}
 			mc.Http.Getter = eg
 
-			err := dl.Download(TestingClientMod1, filePath)
+			err := dl.Download(TestingClientMod1, relFilePath)
 
 			Expect(err).To(Equal(eg.Err))
 
-			exists, _ := afero.Exists(mc.FileSystem, filePath)
+			exists, _ := afero.Exists(fs, fullPath)
 			Expect(exists).To(BeFalse())
 		})
 
@@ -96,14 +104,14 @@ var _ = Describe("Downloader", func() {
 			eg := emptyGetter{Res: &http.Response{Body: rc}}
 			mc.Http.Getter = eg
 
-			mc.FileSystem.MkdirAll(path.Dir(filePath), 0755)
-			mc.FileSystem = afero.NewReadOnlyFs(mc.FileSystem)
+			fs.MkdirAll(path.Dir(relFilePath), 0755)
+			mcfs.Fs = afero.NewReadOnlyFs(fs)
 
-			err := dl.Download(TestingClientMod1, filePath)
+			err := dl.Download(TestingClientMod1, relFilePath)
 
 			Expect(err).To(Not(BeNil()))
 
-			exists, _ := afero.Exists(mc.FileSystem, filePath)
+			exists, _ := afero.Exists(fs, fullPath)
 			Expect(exists).To(BeFalse())
 		})
 	})
@@ -159,13 +167,13 @@ func (g emptyGetter) Get(url string) (*http.Response, error) {
 }
 
 // verify the url passed into the Get func
-type getUrlVerifier struct {
+type getURLVerifier struct {
 	emptyGetter
-	ExpectedUrl string
+	ExpectedURL string
 }
 
 // check the url and return the vals on the struct
-func (v getUrlVerifier) Get(url string) (*http.Response, error) {
-	Expect(url).To(Equal(v.ExpectedUrl))
+func (v getURLVerifier) Get(url string) (*http.Response, error) {
+	Expect(url).To(Equal(v.ExpectedURL))
 	return v.Res, v.Err
 }

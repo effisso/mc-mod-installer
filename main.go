@@ -9,6 +9,6 @@ import (
 var version string
 
 func main() {
-	cmd.Version = version
+	cmd.ToolVersion = version
 	cmd.Execute()
 }

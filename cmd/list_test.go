@@ -37,6 +37,9 @@ var _ = Describe("List Cmd", func() {
 		cfgIoFake = &clientConfigIoSpy{
 			LoadReturn: cfg,
 		}
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoFake
+		}
 
 		groupb := false
 		modb := false
@@ -48,9 +51,7 @@ var _ = Describe("List Cmd", func() {
 			Map:                TestingCliModMap,
 			emptyNameValidator: emptyNameValidator{},
 		}
-
 		cmd.NameValidator = nameValidator
-		cmd.ConfigIo = cfgIoFake
 
 		outBuffer = bytes.NewBufferString("")
 

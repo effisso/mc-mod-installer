@@ -3,7 +3,7 @@ package mc
 // ModFilter is responsible for filtering the list of all mods down to those the user wishes to install
 type ModFilter interface {
 	// GetModsToInstall filters out mods as indicated by the user
-	FilterAllMods(xGroups []string, xMods []string, cfg *ClientModConfig, force bool) ([]*Mod, error)
+	FilterAllMods(xGroups []string, xMods []string, cfg *UserModConfig, force bool) ([]*Mod, error)
 }
 
 type modFilter struct {
@@ -20,7 +20,7 @@ func NewModFilter(mapper ModNameMapper, validator NameValidator) ModFilter {
 }
 
 // GetModsToInstall filters out mods as indicated by the user
-func (f modFilter) FilterAllMods(xGroups []string, xMods []string, cfg *ClientModConfig, force bool) ([]*Mod, error) {
+func (f modFilter) FilterAllMods(xGroups []string, xMods []string, cfg *UserModConfig, force bool) ([]*Mod, error) {
 	mods := []*Mod{}
 	xGroupSet := toSet(xGroups)
 	xModSet := toSet(xMods)
@@ -59,12 +59,12 @@ func (f modFilter) FilterAllMods(xGroups []string, xMods []string, cfg *ClientMo
 	return mods, nil
 }
 
-func latestInstalled(mod *Mod, cfg *ClientModConfig) bool {
+func latestInstalled(mod *Mod, cfg *UserModConfig) bool {
 	latestInstalled := false
 	installation, exists := cfg.ModInstallations[mod.CliName]
 
 	if exists {
-		latestInstalled = mod.LatestUrl == installation.DownloadUrl
+		latestInstalled = mod.LatestURL == installation.DownloadURL
 	}
 
 	return latestInstalled

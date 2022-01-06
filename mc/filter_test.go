@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Filter", func() {
 	var filter mc.ModFilter
-	var cfg *mc.ClientModConfig
+	var cfg *mc.UserModConfig
 	var emptyMapper *emptyNameMapper
 	var emptyValidator *emptyNameValidator
 
@@ -23,7 +23,7 @@ var _ = Describe("Filter", func() {
 		emptyValidator = &emptyNameValidator{}
 		emptyMapper = &emptyNameMapper{}
 		filter = mc.NewModFilter(emptyMapper, emptyValidator)
-		cfg = &mc.ClientModConfig{
+		cfg = &mc.UserModConfig{
 			ModInstallations: map[string]mc.ModInstallation{},
 			ClientMods:       TestingClientMods,
 		}
@@ -76,7 +76,7 @@ var _ = Describe("Filter", func() {
 
 	Context("force", func() {
 		BeforeEach(func() {
-			install := mc.ModInstallation{DownloadUrl: TestingClientMod1.LatestUrl}
+			install := mc.ModInstallation{DownloadURL: TestingClientMod1.LatestURL}
 			cfg.ModInstallations[TestingClientMod1.CliName] = install
 		})
 		When("false", func() {

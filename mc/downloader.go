@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
-
-	"github.com/spf13/afero"
 )
 
 var (
-	// File system to use when reading/writing in the mc package
-	FileSystem = afero.NewOsFs()
-	Http       = &HttpClient{
+	// Http is the client for downloading mods
+	Http = &HTTPClient{
 		Getter: &http.Client{
 			CheckRedirect: CheckRedirect,
 		},
@@ -24,30 +21,32 @@ type ModDownloader interface {
 	Download(mod *Mod, filePath string) error
 }
 
-type modDownloader struct{}
+type modDownloader struct {
+	fs FileSystem
+}
 
-// NewDownloader creates a new instance of a struct which implements Downloader
-func NewModDownloader() ModDownloader {
-	return modDownloader{}
+// NewModDownloader creates a new instance of a struct which implements Downloader
+func NewModDownloader(fs FileSystem) ModDownloader {
+	return modDownloader{fs: fs}
 }
 
 // Download the specified mod from its LatestUrl and save it to the location specified
-func (d modDownloader) Download(mod *Mod, filePath string) error {
-	err := FileSystem.MkdirAll(filepath.Dir(filePath), 0755)
+func (d modDownloader) Download(mod *Mod, relPath string) error {
+	err := d.fs.MkDirAll(filepath.Dir(relPath))
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("  Downloading %s\n    to: %s\n", mod.LatestUrl, filePath)
+	fmt.Printf("  Downloading %s\n    to: %s\n", mod.LatestURL, relPath)
 
-	resp, err := Http.Getter.Get(mod.LatestUrl)
+	resp, err := Http.Getter.Get(mod.LatestURL)
 	if err != nil {
 		return err
 	}
 
 	defer resp.Body.Close()
 
-	err = afero.WriteReader(FileSystem, filePath, resp.Body)
+	err = d.fs.WriteFile(resp.Body, relPath)
 	if err != nil {
 		return err
 	}
@@ -61,14 +60,12 @@ func CheckRedirect(r *http.Request, _ []*http.Request) error {
 	return nil
 }
 
-type HttpGet interface {
+// HTTPGet is the interface for making HTTP GET requests abstractly
+type HTTPGet interface {
 	Get(url string) (*http.Response, error)
 }
 
-type HttpClient struct {
-	Getter HttpGet
-}
-
-func (h *HttpClient) GetRequest(url string) (*http.Response, error) {
-	return h.Getter.Get(url)
+// HTTPClient contains interfaces for interacting with HTTP web services
+type HTTPClient struct {
+	Getter HTTPGet
 }

@@ -23,7 +23,7 @@ func NewNameValidator() NameValidator {
 }
 
 // ValidateServerGroups returns an error if the server group is not valid
-func (_ nameValidator) ValidateServerGroups(groups []string) error {
+func (nameValidator) ValidateServerGroups(groups []string) error {
 	for _, group := range groups {
 		if _, exists := ServerGroups[group]; !exists {
 			return fmt.Errorf("Unknown Server Group: %s", group)
@@ -34,7 +34,7 @@ func (_ nameValidator) ValidateServerGroups(groups []string) error {
 }
 
 // ValidateModCliNames returns an error if any of the mod names are not valid
-func (_ nameValidator) ValidateModCliNames(namesToVerify []string, cliMods ModMap) error {
+func (nameValidator) ValidateModCliNames(namesToVerify []string, cliMods ModMap) error {
 	for _, name := range namesToVerify {
 		if _, exists := cliMods[name]; !exists {
 			return fmt.Errorf("Unknown Mod: %s", name)

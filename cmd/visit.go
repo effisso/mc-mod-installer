@@ -18,14 +18,14 @@ var visitCmd = &cobra.Command{
 Open a browser to the mod's details URL`,
 	Run: func(cmd *cobra.Command, args []string) {
 		modName := args[0]
-		cliMods := NameMapper.MapAllMods(InstallConfig.ClientMods)
+		cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
 		err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
 		cobra.CheckErr(err)
 
 		m := cliMods[modName]
 
-		BrowserLauncher.Open(m.DetailsUrl)
+		BrowserLauncher.Open(m.DetailsURL)
 	},
 }
 

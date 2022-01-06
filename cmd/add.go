@@ -71,8 +71,8 @@ execution.`,
 			FriendlyName: friendlyName,
 			CliName:      cliName,
 			Description:  desc,
-			DetailsUrl:   detUrl,
-			LatestUrl:    dlUrl,
+			DetailsURL:   detUrl,
+			LatestURL:    dlUrl,
 		}
 
 		if *serverMod {
@@ -83,8 +83,8 @@ execution.`,
 			mc.ServerGroups[groupName].Mods = append(mc.ServerGroups[groupName].Mods, mod)
 			err = ServerCfgSaver.Save()
 		} else {
-			InstallConfig.ClientMods = append(InstallConfig.ClientMods, mod)
-			err = ConfigIo.Save(InstallConfig)
+			UserModConfig.ClientMods = append(UserModConfig.ClientMods, mod)
+			err = cfgIo.Save(UserModConfig)
 		}
 
 		if err == nil {
@@ -122,13 +122,11 @@ func init() {
 
 	flags := addCmd.Flags()
 
-	serverMod = newBoolPtr(false)
-
-	flags.BoolVar(serverMod, "server", false, "Add a new mod to the server config. Only allowed when building new versions of this tool.")
+	serverMod = flags.Bool("server", false, "Add a new mod to the server config. Only allowed when building new versions of this tool.")
 
 	InitPrompts()
 }
 
 func getModMap() mc.ModMap {
-	return NameMapper.MapAllMods(InstallConfig.ClientMods)
+	return NameMapper.MapAllMods(UserModConfig.ClientMods)
 }

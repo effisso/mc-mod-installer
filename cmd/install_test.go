@@ -20,6 +20,7 @@ func TestCmds(t *testing.T) {
 var _ = Describe("Install Cmd", func() {
 	var fs afero.Fs
 	var cfgIoFake *clientConfigIoSpy
+	var dl mc.ModDownloader
 
 	BeforeEach(func() {
 		InitTestData()
@@ -34,7 +35,14 @@ var _ = Describe("Install Cmd", func() {
 			LoadReturn: TestingConfig,
 		}
 
-		cmd.ConfigIo = cfgIoFake
+		dl = &fakeDownloader{}
+		cmd.CreateDownloaderFunc = func(fs mc.FileSystem) mc.ModDownloader {
+			return dl
+		}
+
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoFake
+		}
 	})
 
 	Context("verify filter, install, and save config", func() {
@@ -58,7 +66,7 @@ var _ = Describe("Install Cmd", func() {
 			bf := false
 			// verifies args passed to the installer
 			verifyInstaller = &installerVerifier{
-				Downloader: cmd.Downloader,
+				Downloader: dl,
 				Cfg:        TestingConfig,
 				Mods:       []*mc.Mod{},
 				Visited:    &bf,
@@ -228,7 +236,7 @@ type emptyFilter struct {
 	Err    error
 }
 
-func (f emptyFilter) FilterAllMods(xGroups []string, xMods []string, cfg *mc.ClientModConfig, force bool) ([]*mc.Mod, error) {
+func (f emptyFilter) FilterAllMods(xGroups []string, xMods []string, cfg *mc.UserModConfig, force bool) ([]*mc.Mod, error) {
 	return f.Return, f.Err
 }
 
@@ -237,12 +245,12 @@ type filterVerifier struct {
 	emptyFilter
 	XGroups []string
 	XMods   []string
-	Cfg     *mc.ClientModConfig
+	Cfg     *mc.UserModConfig
 	Force   bool
 	Visited *bool
 }
 
-func (f filterVerifier) FilterAllMods(xGroups []string, xMods []string, cfg *mc.ClientModConfig, force bool) ([]*mc.Mod, error) {
+func (f filterVerifier) FilterAllMods(xGroups []string, xMods []string, cfg *mc.UserModConfig, force bool) ([]*mc.Mod, error) {
 	*(f.Visited) = true
 	Expect(xGroups).To(ConsistOf(f.XGroups))
 	Expect(xMods).To(ConsistOf(f.XMods))
@@ -260,7 +268,7 @@ type emptyInstaller struct {
 	Return error
 }
 
-func (i emptyInstaller) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.ClientModConfig) error {
+func (i emptyInstaller) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.UserModConfig) error {
 	return i.Return
 }
 
@@ -269,11 +277,11 @@ type installerVerifier struct {
 	emptyInstaller
 	Downloader mc.ModDownloader
 	Mods       []*mc.Mod
-	Cfg        *mc.ClientModConfig
+	Cfg        *mc.UserModConfig
 	Visited    *bool
 }
 
-func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.ClientModConfig) error {
+func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.UserModConfig) error {
 	*(i.Visited) = true
 	Expect(downloader).To(Equal(i.Downloader))
 	Expect(mods).To(ConsistOf(i.Mods))
@@ -286,17 +294,27 @@ func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.M
 // ----
 
 type clientConfigIoSpy struct {
-	LoadReturn *mc.ClientModConfig
+	LoadReturn *mc.UserModConfig
 	LoadErr    error
 	Saved      *bool
 	SaveErr    error
 }
 
-func (i clientConfigIoSpy) LoadOrNew() (*mc.ClientModConfig, error) {
+func (i clientConfigIoSpy) LoadOrNew() (*mc.UserModConfig, error) {
 	return i.LoadReturn, i.LoadErr
 }
 
-func (i clientConfigIoSpy) Save(cfg *mc.ClientModConfig) error {
+func (i clientConfigIoSpy) Save(cfg *mc.UserModConfig) error {
 	*(i.Saved) = true
 	return i.SaveErr
+}
+
+// ----
+// Downloader
+// ----
+
+type fakeDownloader struct{}
+
+func (fakeDownloader) Download(mod *mc.Mod, relPath string) error {
+	return nil
 }

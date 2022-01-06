@@ -59,7 +59,9 @@ var _ = Describe("Describe Cmd", func() {
 
 		cmd.NameMapper = mapValidator
 		cmd.NameValidator = nameValidator
-		cmd.ConfigIo = cfgIoFake
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoFake
+		}
 
 		outBuffer = bytes.NewBufferString("")
 
@@ -89,7 +91,7 @@ var _ = Describe("Describe Cmd", func() {
 			m := TestingClientMod1
 			nameValidator.Mods = []string{m.CliName}
 			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s\n",
-				m.FriendlyName, m.CliName, m.Description, m.DetailsUrl, m.LatestUrl)
+				m.FriendlyName, m.CliName, m.Description, m.DetailsURL, m.LatestURL)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "mod", m.CliName})
 

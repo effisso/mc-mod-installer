@@ -12,32 +12,68 @@ import (
 )
 
 var (
-	ConfigIo = mc.NewModConfigIo()
+	// CreateFsFunc creates the file system for FTP/Local. Exported for testing
+	CreateFsFunc func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) = mc.NewFs
 
-	cfgFile       string
-	InstallConfig *mc.ClientModConfig
-	serverName    = "[SERVER]"
+	// ConfigIoFunc instantiates an interface for config file IO
+	ConfigIoFunc func(fs mc.FileSystem) mc.ModConfigIo = mc.NewUserModConfigIo
+
+	// UserModConfig contains information about mod installations on the file
+	// system
+	UserModConfig *mc.UserModConfig
+
+	// ToolVersion is the release version of the tool
+	ToolVersion string
+
+	// ViperInstance is the common instance of viper shared through the package
 	ViperInstance = viper.GetViper()
 
-	Version      string
+	fs           mc.FileSystem
+	cfgIo        mc.ModConfigIo
+	cfgFile      string
+	ftpUser      string
+	ftpPw        string
+	ftpServer    string
 	printVersion *bool
 )
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "mcmods",
-	Short: "Tool for installing/maintaining mods for the server " + serverName,
+	Short: "Tool for installing/maintaining mods for the CDP YAMS server.",
 	Long: `
-This tool installs and updates mods on a machine for connecting to.
-a Minecraft server. The server is private, and only available by
-invite. To inquire about an invite, please call 1-888-PISS-OFF and
-ask for Dianne.`,
+This tool installs and updates mods on a machine for connecting to the CDP YAMS
+Minecraft server. The server is private, and only available by invite. To
+inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		var ftpArgs *mc.FtpArgs
+		var err error
+
+		if ftpPw != "" {
+			ftpArgs = &mc.FtpArgs{
+				Server: ViperInstance.GetString(mc.FtpServerKey),
+				User:   ViperInstance.GetString(mc.FtpUserKey),
+				Pw:     ftpPw,
+			}
+		}
+
+		fs, err = CreateFsFunc(ftpArgs)
+		cobra.CheckErr(err)
+
+		cfgIo = ConfigIoFunc(fs)
+
+		UserModConfig, err = cfgIo.LoadOrNew()
+		cobra.CheckErr(err)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if *printVersion {
-			fmt.Println(Version)
+			fmt.Println(ToolVersion)
 			return nil
 		}
 		return errors.New("no arguments specified")
+	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		fs.Close()
 	},
 }
 
@@ -48,32 +84,42 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	ResetRootVars()
+
+	cobra.OnInitialize(initViper)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mcmods.yaml)")
 
-	printVersion = RootCmd.Flags().BoolP("version", "v", false, "Show the version of this tool")
+	RootCmd.PersistentFlags().StringVar(&ftpServer, "ftp-server", "", "The FTP server for managing server-side mods. Stored, only needed on the first command.")
+	RootCmd.PersistentFlags().StringVarP(&ftpUser, "user", "u", "", "The FTP username. Stored, only needed on the first command.")
+	RootCmd.PersistentFlags().StringVarP(&ftpPw, "password", "p", "", "The FTP password. Not stored, needed every time.")
+
+	printVersion = RootCmd.Flags().BoolP("version", "v", false, "Show the version of this tool.")
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
+// ResetRootVars is only used for testing
+func ResetRootVars() {
+	cfgFile = ""
+	ftpUser = ""
+	ftpPw = ""
+	ftpServer = ""
+}
+
+// initViper reads in a config file through Viper
+func initViper() {
 	if cfgFile != "" {
-		// Use config file from the flag.
 		ViperInstance.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".mcmods" (without extension).
 		ViperInstance.AddConfigPath(home)
 		ViperInstance.SetConfigType("yaml")
 		ViperInstance.SetConfigName(".mcmods")
 	}
 
-	ViperInstance.SetDefault(mc.InstallPathKey, mc.MinecraftDir)
+	ViperInstance.SetDefault(mc.InstallPathKey, mc.DefaultOsMinecraftDir)
 
-	// If a config file is found, read it in.
 	if err := ViperInstance.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found
@@ -85,10 +131,18 @@ func initConfig() {
 		}
 	}
 
-	var err error
-	InstallConfig, err = ConfigIo.LoadOrNew()
-	if err != nil {
-		panic(err)
+	updated := false
+	if ftpUser != "" {
+		updated = true
+		ViperInstance.Set(mc.FtpUserKey, ftpUser)
+	}
+	if ftpServer != "" {
+		updated = true
+		ViperInstance.Set(mc.FtpServerKey, ftpServer)
+	}
+
+	if updated {
+		ViperInstance.WriteConfig()
 	}
 }
 

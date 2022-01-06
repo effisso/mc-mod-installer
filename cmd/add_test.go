@@ -16,15 +16,15 @@ import (
 )
 
 var _ = Describe("Add Cmd", func() {
-	var fs afero.Fs
+	var fs mc.FileSystem
 
 	var mapValidator *nameMapperValidator
 	var cfgIoSpy *clientConfigIoSpy
 	var friendlyNoOp *noOpPrompt
 	var cliNameNoOp *noOpPrompt
 	var descNoOp *noOpPrompt
-	var detailUrlNoOp *noOpPrompt
-	var latestUrlNoOp *noOpPrompt
+	var detailURLNoOp *noOpPrompt
+	var latestURLNoOp *noOpPrompt
 	var groupNoOp *noOpPrompt
 	var serverAddSaveFake *serverAddSaveNoOp
 
@@ -32,8 +32,9 @@ var _ = Describe("Add Cmd", func() {
 
 	BeforeEach(func() {
 		InitTestData()
-		fs = afero.NewMemMapFs()
-		cmd.ViperInstance.SetFs(fs)
+		afs := afero.NewMemMapFs()
+		fs = &mc.LocalFileSystem{Fs: afs}
+		cmd.ViperInstance.SetFs(afs)
 
 		mapb := false
 		mapValidator = &nameMapperValidator{
@@ -47,6 +48,7 @@ var _ = Describe("Add Cmd", func() {
 		cfg := TestingConfig
 		cfg.ClientMods = TestingClientMods
 		b := false
+
 		cfgIoSpy = &clientConfigIoSpy{
 			Saved:      &b,
 			LoadReturn: cfg,
@@ -55,21 +57,26 @@ var _ = Describe("Add Cmd", func() {
 		serverAddSaveFake = &serverAddSaveNoOp{}
 
 		cmd.NameMapper = mapValidator
-		cmd.ConfigIo = cfgIoSpy
 		cmd.ServerCfgSaver = serverAddSaveFake
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoSpy
+		}
+		cmd.CreateFsFunc = func(f *mc.FtpArgs) (mc.FileSystem, error) {
+			return fs, nil
+		}
 
 		friendlyNoOp = &noOpPrompt{}
 		cliNameNoOp = &noOpPrompt{}
 		descNoOp = &noOpPrompt{}
-		detailUrlNoOp = &noOpPrompt{}
-		latestUrlNoOp = &noOpPrompt{}
+		detailURLNoOp = &noOpPrompt{}
+		latestURLNoOp = &noOpPrompt{}
 		groupNoOp = &noOpPrompt{ReturnStr: groupName}
 
 		cmd.FriendlyPrompt = friendlyNoOp
 		cmd.CliNamePrompt = cliNameNoOp
 		cmd.DescPrompt = descNoOp
-		cmd.DetailsUrlPrompt = detailUrlNoOp
-		cmd.DownloadUrlPrompt = latestUrlNoOp
+		cmd.DetailsUrlPrompt = detailURLNoOp
+		cmd.DownloadUrlPrompt = latestURLNoOp
 		cmd.GroupPrompt = groupNoOp
 
 		mc.ServerGroups = TestingServerGroups
@@ -107,7 +114,7 @@ var _ = Describe("Add Cmd", func() {
 		})
 
 		It("returns error from detail URL prompt", func() {
-			detailUrlNoOp.ReturnErr = expectedErr
+			detailURLNoOp.ReturnErr = expectedErr
 
 			err := cmd.RootCmd.Execute()
 
@@ -115,7 +122,7 @@ var _ = Describe("Add Cmd", func() {
 		})
 
 		It("returns error from download url prompt", func() {
-			latestUrlNoOp.ReturnErr = expectedErr
+			latestURLNoOp.ReturnErr = expectedErr
 
 			err := cmd.RootCmd.Execute()
 
@@ -149,15 +156,15 @@ var _ = Describe("Add Cmd", func() {
 				FriendlyName: "Some fun mod",
 				CliName:      "funmod",
 				Description:  "A super duper fun mod",
-				DetailsUrl:   "<pretend this is a url>",
-				LatestUrl:    "<also pretend this is a url>",
+				DetailsURL:   "<pretend this is a url>",
+				LatestURL:    "<also pretend this is a url>",
 			}
 
 			friendlyNoOp.ReturnStr = expectedModValues.FriendlyName
 			cliNameNoOp.ReturnStr = expectedModValues.CliName
 			descNoOp.ReturnStr = expectedModValues.Description
-			detailUrlNoOp.ReturnStr = expectedModValues.DetailsUrl
-			latestUrlNoOp.ReturnStr = expectedModValues.LatestUrl
+			detailURLNoOp.ReturnStr = expectedModValues.DetailsURL
+			latestURLNoOp.ReturnStr = expectedModValues.LatestURL
 		})
 
 		Context("client mod", func() {
@@ -171,7 +178,9 @@ var _ = Describe("Add Cmd", func() {
 					Saved:           &b,
 				}
 
-				cmd.ConfigIo = clientAddIo
+				cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+					return clientAddIo
+				}
 			})
 
 			It("adds a new mod to the client install config before saving", func() {
@@ -286,16 +295,16 @@ func (p noOpPrompt) GetInput(w io.Writer, r io.Reader) (string, error) {
 }
 
 type clientAddIoValidator struct {
-	LoadReturn      *mc.ClientModConfig
+	LoadReturn      *mc.UserModConfig
 	ExpectedModCopy *mc.Mod
 	Saved           *bool
 }
 
-func (i clientAddIoValidator) LoadOrNew() (*mc.ClientModConfig, error) {
+func (i clientAddIoValidator) LoadOrNew() (*mc.UserModConfig, error) {
 	return i.LoadReturn, nil
 }
 
-func (i clientAddIoValidator) Save(cfg *mc.ClientModConfig) error {
+func (i clientAddIoValidator) Save(cfg *mc.UserModConfig) error {
 	*(i.Saved) = true
 	var mod, cMod *mc.Mod
 
@@ -315,8 +324,8 @@ func validateMod(actual *mc.Mod, expected *mc.Mod) {
 	Expect(actual).ToNot(BeNil())
 	Expect(actual.FriendlyName).To(Equal(expected.FriendlyName))
 	Expect(actual.Description).To(Equal(expected.Description))
-	Expect(actual.DetailsUrl).To(Equal(expected.DetailsUrl))
-	Expect(actual.LatestUrl).To(Equal(expected.LatestUrl))
+	Expect(actual.DetailsURL).To(Equal(expected.DetailsURL))
+	Expect(actual.LatestURL).To(Equal(expected.LatestURL))
 }
 
 type serverAddSaveNoOp struct {

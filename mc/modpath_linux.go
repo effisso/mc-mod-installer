@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 package mc
@@ -6,4 +7,4 @@ import (
 	"path/filepath"
 )
 
-var MinecraftDir = filepath.Join("$HOME", ".minecraft")
+var DefaultOsMinecraftDir = filepath.Join("$HOME", ".minecraft")

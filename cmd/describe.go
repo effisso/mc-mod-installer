@@ -53,7 +53,7 @@ func init() {
 }
 
 func describeMod(modName string) error {
-	cliMods := NameMapper.MapAllMods(InstallConfig.ClientMods)
+	cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
 	err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
 	if err != nil {
@@ -62,7 +62,7 @@ func describeMod(modName string) error {
 
 	m := cliMods[modName]
 	printToUser(fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s",
-		m.FriendlyName, m.CliName, m.Description, m.DetailsUrl, m.LatestUrl))
+		m.FriendlyName, m.CliName, m.Description, m.DetailsURL, m.LatestURL))
 
 	return nil
 }
@@ -83,7 +83,7 @@ func describeGroup(groupName string) error {
 }
 
 func describeInstall(modName string) error {
-	cliMods := NameMapper.MapAllMods(InstallConfig.ClientMods)
+	cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
 	err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
 	if err != nil {
@@ -91,11 +91,11 @@ func describeInstall(modName string) error {
 	}
 
 	m := cliMods[modName]
-	i, exists := InstallConfig.ModInstallations[modName]
+	i, exists := UserModConfig.ModInstallations[modName]
 
 	if exists {
 		printToUser(fmt.Sprintf("\n%s (%s)\n-----\nInstall timestamp:  %s\nUp-to-date:  %t",
-			m.FriendlyName, m.CliName, i.Timestamp, m.LatestUrl == i.DownloadUrl))
+			m.FriendlyName, m.CliName, i.Timestamp, m.LatestURL == i.DownloadURL))
 	} else {
 		printToUser("Not Installed.")
 	}

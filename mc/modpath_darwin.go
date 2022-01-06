@@ -1,7 +1,8 @@
+//go:build darwin
 // +build darwin
 
 package mc
 
 import "path/filepath"
 
-var MinecraftDir = filepath.Join("~", "Library", "Application Support", "minecraft")
+var DefaultOsMinecraftDir = filepath.Join("~", "Library", "Application Support", "minecraft")
