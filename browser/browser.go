@@ -10,6 +10,6 @@ func NewLauncher() Launcher {
 	return launcher{}
 }
 
-func (_ launcher) Open(url string) error {
+func (launcher) Open(url string) error {
 	return getBrowserCmd(url).Start()
 }
