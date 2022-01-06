@@ -20,7 +20,7 @@ var _ = Describe("Config IO", func() {
 		InitTestData()
 
 		mcPath := "/path/to/mc"
-		configPath = filepath.Join(mcPath, mc.ModsFolderName, mc.ModConfigFileName)
+		configPath = filepath.Join(mcPath, mc.ModFolderName, mc.ModConfigFileName)
 
 		b, _ := json.MarshalIndent(TestingConfig, "", "\t")
 		content = string(b)

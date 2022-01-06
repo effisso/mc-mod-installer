@@ -29,7 +29,7 @@ func NewModInstaller() ModInstaller {
 func (i modInstaller) InstallMods(downloader ModDownloader, mods []*Mod, cfg *UserModConfig) error {
 	for _, m := range mods {
 		fileName := fmt.Sprintf("%s.jar", m.CliName)
-		modPath := filepath.Join(ModsFolderName, fileName)
+		modPath := filepath.Join(ModFolderName, fileName)
 
 		fmt.Printf("Installing %s\n", m.FriendlyName)
 		err := downloader.Download(m, modPath)

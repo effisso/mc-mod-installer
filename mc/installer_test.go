@@ -34,7 +34,7 @@ var _ = Describe("Installer", func() {
 
 	It("passes correct args to the downloader", func() {
 		dl := verifyingDownloader{
-			ExpectedPath: filepath.Join(mc.ModsFolderName, TestingClientMod1.CliName+".jar"),
+			ExpectedPath: filepath.Join(mc.ModFolderName, TestingClientMod1.CliName+".jar"),
 			ExpectedMod:  TestingClientMod1,
 		}
 

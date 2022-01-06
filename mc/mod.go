@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	// ModsFolderName - The name of the mods folder in the minecraft installation directory
-	ModsFolderName = "mods"
+	// ModFolderName - The name of the mods folder in the minecraft installation directory
+	ModFolderName = "mods"
 
 	// InstallPathKey - The key in the Viper config which defines the full path to Minecraft on disk
 	InstallPathKey = "mcInstallPath"

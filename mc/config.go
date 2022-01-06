@@ -76,7 +76,7 @@ func (m modConfigIo) Save(cfg *UserModConfig) error {
 }
 
 func relUserConfigPath() string {
-	return filepath.Join(ModsFolderName, ModConfigFileName)
+	return filepath.Join(ModFolderName, ModConfigFileName)
 }
 
 // ServerConfigSaver saves the server mod JSON file which is embedded in this

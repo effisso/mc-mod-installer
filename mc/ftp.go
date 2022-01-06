@@ -2,6 +2,7 @@ package mc
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/textproto"
@@ -77,9 +78,10 @@ func GetRecursiveDirs(dir string) []string {
 
 // FtpArgs represents the information necessary to connect to FTP servers
 type FtpArgs struct {
-	Server string
-	User   string
-	Pw     string
+	Server    string
+	User      string
+	Pw        string
+	TimeoutMs uint
 }
 
 func openFtpToServer(args *FtpArgs) (*ftp.ServerConn, error) {
@@ -87,10 +89,16 @@ func openFtpToServer(args *FtpArgs) (*ftp.ServerConn, error) {
 		return nil, errors.New("FTP access requires a username, password, and server")
 	}
 
-	ftpConnection, err := ftp.Dial(args.Server, ftp.DialWithTimeout(5*time.Second))
+	fmt.Printf("Connecting FTP to %s\n", args.Server)
+
+	timeoutOpt := ftp.DialWithTimeout(time.Duration(args.TimeoutMs) * time.Millisecond)
+
+	ftpConnection, err := ftp.Dial(args.Server, timeoutOpt)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("Logging in (%s)\n", args.User)
 
 	err = ftpConnection.Login(args.User, args.Pw)
 	if err != nil {
