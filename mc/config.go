@@ -69,7 +69,7 @@ func (m modConfigIo) LoadOrNew() (*UserModConfig, error) {
 func (m modConfigIo) Save(cfg *UserModConfig) error {
 	b, err := json.MarshalIndent(cfg, "", "\t")
 	if err != nil {
-		return err
+		return err // not sure how to test :/
 	}
 
 	return m.Fs.WriteFile(bytes.NewReader(b), relUserConfigPath())

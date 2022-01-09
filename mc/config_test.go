@@ -120,4 +120,16 @@ var _ = Describe("Config IO", func() {
 			Expect(string(b)).To(Equal(content))
 		})
 	})
+
+	Context("New func", func() {
+		It("returns an empty config", func() {
+			cfg := mc.NewUserModConfig()
+
+			Expect(cfg).ToNot(BeNil())
+			Expect(cfg.ClientMods).ToNot(BeNil())
+			Expect(cfg.ClientMods).To(BeEmpty())
+			Expect(cfg.ModInstallations).ToNot(BeNil())
+			Expect(cfg.ModInstallations).To(BeEmpty())
+		})
+	})
 })
