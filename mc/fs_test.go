@@ -65,4 +65,11 @@ var _ = Describe("Local File System", func() {
 			Expect(exists).To(BeTrue())
 		})
 	})
+
+	Context("Close", func() {
+		It("does nothing", func() {
+			fs.Close()
+			Expect(1).To(Equal(1))
+		})
+	})
 })

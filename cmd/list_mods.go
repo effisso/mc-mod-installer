@@ -55,9 +55,6 @@ Examples:
 
 		if *listServer {
 			for _, mod := range getServerMods() {
-				if mod == nil {
-					continue
-				}
 				printToUser(mod.CliName)
 			}
 		}

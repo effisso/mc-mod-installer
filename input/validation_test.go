@@ -2,6 +2,7 @@ package input_test
 
 import (
 	"fmt"
+	"mcmods/cmd"
 	"mcmods/input"
 	"mcmods/mc"
 	. "mcmods/testdata"
@@ -136,7 +137,7 @@ var _ = Describe("Validations", func() {
 		})
 
 		It("should return nil if the name is valid", func() {
-			groups := []string{"required", "optional", "performance", "server-only"}
+			groups := []string{"required", "optional", "performance", cmd.ServerOnlyGroupKey}
 
 			for _, name := range groups {
 				err := validator.Validate(name)

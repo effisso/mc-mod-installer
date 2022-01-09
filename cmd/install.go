@@ -11,7 +11,7 @@ const (
 )
 
 var (
-	CreateDownloaderFunc func(fs mc.FileSystem) mc.ModDownloader = mc.NewModDownloader
+	CreateDownloaderFunc func(fs mc.FileSystem) mc.ModDownloader = CreateDefaultDownloader
 
 	NameValidator = mc.NewNameValidator()
 	NameMapper    = mc.NewModNameMapper()
@@ -40,8 +40,11 @@ For advanced users wanting to use a custom set of performance-related mods or
 those who simply don't want the optional mods on their machine, see the --help
 command to read about filtering.
 
-To perform a server install, use the --full-server option with nothing else:
-$ install --full-server`,
+To perform a server install, use the --full-server option the FTP info:
+  $ install --full-server --user <ftp-user> --password <pw> --server <server>
+
+The FTP server and user are stored, so they're only needed on the first
+command. Password is needed every time. `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !*fullServer {
 			if *clientOnly {
@@ -103,4 +106,8 @@ func getServerModGroupNames(m map[string]*mc.ServerGroup) []string {
 		keys = append(keys, k)
 	}
 	return keys
+}
+
+func CreateDefaultDownloader(fs mc.FileSystem) mc.ModDownloader {
+	return mc.NewModDownloader(mc.NewHTTPClient(), fs)
 }

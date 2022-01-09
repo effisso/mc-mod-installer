@@ -6,8 +6,6 @@ import (
 	"mcmods/mc"
 	. "mcmods/testdata"
 	"net/http"
-	"net/url"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -21,30 +19,13 @@ var _ = Describe("Downloader", func() {
 		InitTestData()
 	})
 
-	Context("http client", func() {
-		It("follows redirects", func() {
-			testPath := "http://www.google.com/"
-			req := &http.Request{
-				URL: &url.URL{
-					Path: testPath,
-				},
-			}
-
-			client, ok := mc.Http.Getter.(*http.Client)
-			Expect(ok).To(BeTrue())
-
-			err := client.CheckRedirect(req, []*http.Request{})
-
-			Expect(err).To(BeNil())
-			Expect(req.URL.Opaque).To(Equal(testPath))
-		})
-	})
-
 	Context("download func", func() {
 		var fs afero.Fs
 		var mcfs *mc.LocalFileSystem
 		var dl mc.ModDownloader
 		var rc io.ReadCloser
+		var hc *mc.HTTPClient
+		var eg *emptyGetter
 
 		mcInstallPath := "/root/folder/.minecraft"
 		relFilePath := "some/path/to/a.jar"
@@ -54,15 +35,15 @@ var _ = Describe("Downloader", func() {
 		BeforeEach(func() {
 			mc.ViperInstance.Set(mc.InstallPathKey, mcInstallPath)
 
+			rc = io.NopCloser(strings.NewReader(content))
 			fs = afero.NewMemMapFs()
 			mcfs = &mc.LocalFileSystem{Fs: fs}
-			dl = mc.NewModDownloader(mcfs)
-			rc = io.NopCloser(strings.NewReader(content))
+			eg = &emptyGetter{Res: &http.Response{Body: rc}}
+			hc = &mc.HTTPClient{Getter: eg}
+			dl = mc.NewModDownloader(hc, mcfs)
 		})
 
 		It("creates directories if not present, writes file contents", func() {
-			mc.Http.Getter = emptyGetter{Res: &http.Response{Body: rc}}
-
 			err := dl.Download(TestingClientMod1, relFilePath)
 
 			Expect(err).To(BeNil())
@@ -75,9 +56,8 @@ var _ = Describe("Downloader", func() {
 		})
 
 		It("doesn't download if dirs can't be created", func() {
-			eg := emptyGetter{Err: errors.New("this error won't be returned")}
+			eg.Err = errors.New("this error won't be returned")
 			mcfs.Fs = afero.NewReadOnlyFs(fs)
-			mc.Http.Getter = eg
 
 			err := dl.Download(TestingClientMod1, relFilePath)
 
@@ -89,8 +69,7 @@ var _ = Describe("Downloader", func() {
 		})
 
 		It("doesn't write the file if the download fails", func() {
-			eg := emptyGetter{Err: errors.New("bad url, or something. idk")}
-			mc.Http.Getter = eg
+			eg.Err = errors.New("bad url, or something. idk")
 
 			err := dl.Download(TestingClientMod1, relFilePath)
 
@@ -101,11 +80,14 @@ var _ = Describe("Downloader", func() {
 		})
 
 		It("returns an error if the write fails", func() {
-			eg := emptyGetter{Res: &http.Response{Body: rc}}
-			mc.Http.Getter = eg
-
-			fs.MkdirAll(path.Dir(relFilePath), 0755)
-			mcfs.Fs = afero.NewReadOnlyFs(fs)
+			hc.Getter = emptyGetterWithTask{
+				emptyGetter: emptyGetter{Res: &http.Response{Body: rc}},
+				task: func() {
+					// while the http get would be happening, "lock" the file system so the file
+					// can't be written to ensure errors created from the underlying FS get returned
+					mcfs.Fs = afero.NewReadOnlyFs(fs)
+				},
+			}
 
 			err := dl.Download(TestingClientMod1, relFilePath)
 
@@ -176,4 +158,16 @@ type getURLVerifier struct {
 func (v getURLVerifier) Get(url string) (*http.Response, error) {
 	Expect(url).To(Equal(v.ExpectedURL))
 	return v.Res, v.Err
+}
+
+// runs a task when the download should happen to change some state during a test
+type emptyGetterWithTask struct {
+	emptyGetter
+	task func()
+}
+
+// just return the response and error on the struct
+func (g emptyGetterWithTask) Get(url string) (*http.Response, error) {
+	g.task()
+	return g.Res, g.Err
 }

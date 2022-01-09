@@ -261,7 +261,7 @@ var _ = Describe("Add Cmd", func() {
 		Describe("Server Group prompt", func() {
 			It("allows server groups", func() {
 				validNames := []string{
-					"required", "optional", "performance", "server-only",
+					"required", "optional", "performance", cmd.ServerOnlyGroupKey,
 				}
 
 				for _, name := range validNames {

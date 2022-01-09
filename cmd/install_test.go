@@ -81,7 +81,7 @@ var _ = Describe("Install Cmd", func() {
 
 		When("no args", func() {
 			It("adds server-only to the list of groups to exclude", func() {
-				verifyFilter.XGroups = []string{"server-only"}
+				verifyFilter.XGroups = []string{cmd.ServerOnlyGroupKey}
 				verifyFilter.Return = append(TestingClientMods, TestingServerOptional1, TestingServerPerformance1, TestingServerRequired1)
 				verifyInstaller.Mods = verifyFilter.Return
 				cmd.RootCmd.SetArgs([]string{"install"})
@@ -122,7 +122,25 @@ var _ = Describe("Install Cmd", func() {
 			})
 		})
 
-		It("returns error from save", func() {
+		It("returns error from filtering", func() {
+			badGroup := "not-real-group"
+			verifyFilter.Err = errors.New("filter err")
+			verifyFilter.XGroups = []string{badGroup, cmd.ServerOnlyGroupKey}
+			cmd.RootCmd.SetArgs([]string{"install", "--x-group", badGroup})
+
+			err := cmd.RootCmd.Execute()
+			Expect(err).To(Equal(verifyFilter.Err))
+		})
+
+		It("returns error from installing", func() {
+			verifyInstaller.Return = errors.New("install err")
+			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
+
+			err := cmd.RootCmd.Execute()
+			Expect(err).To(Equal(verifyInstaller.Return))
+		})
+
+		It("returns error from saving", func() {
 			cfgIoFake.SaveErr = errors.New("save err")
 			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
 
@@ -202,7 +220,7 @@ var _ = Describe("Install Cmd", func() {
 				})
 
 				It("adds server-only to the group exclusion list", func() {
-					filter.XGroups = []string{"performance", "server-only"}
+					filter.XGroups = []string{"performance", cmd.ServerOnlyGroupKey}
 					cmd.RootCmd.SetArgs([]string{"install", "--x-group", "performance"})
 
 					err := cmd.RootCmd.Execute()
@@ -212,7 +230,7 @@ var _ = Describe("Install Cmd", func() {
 				})
 
 				It("excludes the mods exclusion list", func() {
-					filter.XGroups = []string{"server-only"}
+					filter.XGroups = []string{cmd.ServerOnlyGroupKey}
 					filter.XMods = []string{TestingClientMod1.CliName}
 					cmd.RootCmd.SetArgs([]string{"install", "--x-mod", TestingClientMod1.CliName})
 
@@ -222,6 +240,20 @@ var _ = Describe("Install Cmd", func() {
 					Expect(*filter.Visited).To(BeTrue(), "mods not filtered")
 				})
 			})
+		})
+	})
+
+	Context("CreateDefaultDownloader", func() {
+		It("returns an initialized downloader", func() {
+			mcfs := mc.LocalFileSystem{Fs: fs}
+			dl := cmd.CreateDefaultDownloader(mcfs)
+
+			Expect(dl).ToNot(BeNil())
+
+			concrete := dl.(*mc.ModDownloaderImpl)
+
+			Expect(concrete.Fs).ToNot(BeNil())
+			Expect(concrete.HTTPClient).ToNot(BeNil())
 		})
 	})
 })
