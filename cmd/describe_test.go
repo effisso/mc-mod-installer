@@ -171,7 +171,7 @@ var _ = Describe("Describe Cmd", func() {
 
 	Context("other", func() {
 		It("returns an error", func() {
-			cmd.RootCmd.SetArgs([]string{"describe", "invalid"})
+			cmd.RootCmd.SetArgs([]string{"describe", "invalid", "doesnt-matter"})
 
 			Expect(cmd.RootCmd.Execute()).To(Not(BeNil()))
 		})
