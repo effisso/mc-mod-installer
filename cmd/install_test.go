@@ -19,7 +19,7 @@ func TestCmds(t *testing.T) {
 
 var _ = Describe("Install Cmd", func() {
 	var fs afero.Fs
-	var cfgIoFake *clientConfigIoSpy
+	var cfgIoSpy *clientConfigIoSpy
 	var dl mc.ModDownloader
 
 	BeforeEach(func() {
@@ -30,7 +30,7 @@ var _ = Describe("Install Cmd", func() {
 		cmd.ViperInstance.SetFs(fs)
 
 		b := false
-		cfgIoFake = &clientConfigIoSpy{
+		cfgIoSpy = &clientConfigIoSpy{
 			Saved:      &b,
 			LoadReturn: TestingConfig,
 		}
@@ -41,7 +41,7 @@ var _ = Describe("Install Cmd", func() {
 		}
 
 		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoFake
+			return cfgIoSpy
 		}
 	})
 
@@ -91,7 +91,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -104,7 +104,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -118,7 +118,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -141,11 +141,11 @@ var _ = Describe("Install Cmd", func() {
 		})
 
 		It("returns error from saving", func() {
-			cfgIoFake.SaveErr = errors.New("save err")
+			cfgIoSpy.SaveErr = errors.New("save err")
 			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
 
 			err := cmd.RootCmd.Execute()
-			Expect(err).To(Equal(cfgIoFake.SaveErr))
+			Expect(err).To(Equal(cfgIoSpy.SaveErr))
 		})
 	})
 	Context("client install", func() {

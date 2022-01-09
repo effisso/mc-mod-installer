@@ -13,10 +13,9 @@ const (
 var (
 	CreateDownloaderFunc func(fs mc.FileSystem) mc.ModDownloader = CreateDefaultDownloader
 
-	NameValidator = mc.NewNameValidator()
-	NameMapper    = mc.NewModNameMapper()
-	Filter        = mc.NewModFilter(NameMapper, NameValidator)
-	Installer     = mc.NewModInstaller()
+	NameMapper = mc.NewModNameMapper()
+	Filter     = mc.NewModFilter(NameMapper)
+	Installer  = mc.NewModInstaller()
 
 	force      *bool
 	fullServer *bool

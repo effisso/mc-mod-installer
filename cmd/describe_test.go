@@ -2,7 +2,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,8 +20,7 @@ var _ = Describe("Describe Cmd", func() {
 	var outBuffer *bytes.Buffer
 
 	var mapValidator *nameMapperValidator
-	var nameValidator *vNameValidator
-	var cfgIoFake *clientConfigIoSpy
+	var cfgIoSpy *clientConfigIoSpy
 
 	BeforeEach(func() {
 		InitTestData()
@@ -41,25 +39,11 @@ var _ = Describe("Describe Cmd", func() {
 		}
 		cmd.NameMapper = mapValidator
 
-		groupb := false
-		modb := false
-		nameValidator = &vNameValidator{
-			Groups:             []string{},
-			Mods:               []string{},
-			VisitedGroup:       &groupb,
-			VisitedMod:         &modb,
-			Map:                TestingCliModMap,
-			emptyNameValidator: emptyNameValidator{},
-		}
-		cmd.NameValidator = nameValidator
-
-		cfg := TestingConfig
-		cfg.ClientMods = TestingClientMods
-		cfgIoFake = &clientConfigIoSpy{
-			LoadReturn: cfg,
+		cfgIoSpy = &clientConfigIoSpy{
+			LoadReturn: TestingConfig,
 		}
 		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoFake
+			return cfgIoSpy
 		}
 
 		outBuffer = bytes.NewBufferString("")
@@ -77,18 +61,15 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("invalid mod name returns an error", func() {
-			nameValidator.Mods = []string{"invalid"}
-			nameValidator.ModsReturn = errors.New("invalid mod name")
 			cmd.RootCmd.SetArgs([]string{"describe", "mod", "invalid"})
 
 			err := cmd.RootCmd.Execute()
 
-			Expect(err).To(Equal(nameValidator.ModsReturn))
+			Expect(err).ToNot(BeNil())
 		})
 
 		It("describes the mod", func() {
 			m := TestingClientMod1
-			nameValidator.Mods = []string{m.CliName}
 			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s\n",
 				m.FriendlyName, m.CliName, m.Description, m.DetailsURL, m.LatestURL)
 
@@ -108,18 +89,15 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("invalid group name returns an error", func() {
-			nameValidator.Groups = []string{"invalid"}
-			nameValidator.GroupsReturn = errors.New("invalid group name")
 			cmd.RootCmd.SetArgs([]string{"describe", "group", "invalid"})
 
 			err := cmd.RootCmd.Execute()
 
-			Expect(err).To(Equal(nameValidator.GroupsReturn))
+			Expect(err).ToNot(BeNil())
 		})
 
 		It("describes the group", func() {
 			m := TestingServerRequired1
-			nameValidator.Groups = []string{"required"}
 			expectedOutput := fmt.Sprintf("%s\n", m.CliName)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "group", "required"})
@@ -138,18 +116,15 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("invalid mod name returns an error", func() {
-			nameValidator.Mods = []string{"invalid"}
-			nameValidator.ModsReturn = errors.New("invalid mod name")
 			cmd.RootCmd.SetArgs([]string{"describe", "install", "invalid"})
 
 			err := cmd.RootCmd.Execute()
 
-			Expect(err).To(Equal(nameValidator.ModsReturn))
+			Expect(err).ToNot(BeNil())
 		})
 
 		It("describes the install", func() {
 			m := TestingClientMod1
-			nameValidator.Mods = []string{TestingClientMod1.CliName}
 			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\nInstall timestamp:  %s\nUp-to-date:  %t\n",
 				m.FriendlyName, m.CliName, "123", false)
 
@@ -159,7 +134,6 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("informs when not installed", func() {
-			nameValidator.Mods = []string{TestingServerOnly1.CliName}
 			expectedOutput := fmt.Sprintf("Not Installed.\n")
 
 			cmd.RootCmd.SetArgs([]string{"describe", "install", TestingServerOnly1.CliName})
@@ -195,45 +169,6 @@ func executeAndVerifyOutput(outBuffer io.Reader, expectedOutput string, lineOrde
 
 		Expect(outLines).To(ConsistOf(expectedLines))
 	}
-}
-
-// ----
-// Name Validator Mocks
-// ----
-
-type emptyNameValidator struct {
-	GroupsReturn error
-	ModsReturn   error
-}
-
-func (v emptyNameValidator) ValidateServerGroups(groups []string) error {
-	return v.GroupsReturn
-}
-
-func (v emptyNameValidator) ValidateModCliNames(namesToVerify []string, cliMods mc.ModMap) error {
-	return v.ModsReturn
-}
-
-type vNameValidator struct {
-	emptyNameValidator
-	Groups       []string
-	Mods         []string
-	Map          mc.ModMap
-	VisitedGroup *bool
-	VisitedMod   *bool
-}
-
-func (v vNameValidator) ValidateServerGroups(groups []string) error {
-	*(v.VisitedGroup) = true
-	Expect(groups).To(ConsistOf(v.Groups))
-	return v.GroupsReturn
-}
-
-func (v vNameValidator) ValidateModCliNames(namesToVerify []string, cliMods mc.ModMap) error {
-	*(v.VisitedMod) = true
-	Expect(namesToVerify).To(ConsistOf(v.Mods))
-	Expect(cliMods).To(Equal(v.Map))
-	return v.ModsReturn
 }
 
 // ----

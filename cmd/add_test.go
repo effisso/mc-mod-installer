@@ -44,23 +44,20 @@ var _ = Describe("Add Cmd", func() {
 				Map: TestingCliModMap,
 			},
 		}
+		cmd.NameMapper = mapValidator
 
-		cfg := TestingConfig
-		cfg.ClientMods = TestingClientMods
 		b := false
-
 		cfgIoSpy = &clientConfigIoSpy{
 			Saved:      &b,
-			LoadReturn: cfg,
+			LoadReturn: TestingConfig,
+		}
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoSpy
 		}
 
 		serverAddSaveFake = &serverAddSaveNoOp{}
 
-		cmd.NameMapper = mapValidator
 		cmd.ServerCfgSaver = serverAddSaveFake
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
-		}
 		cmd.CreateFsFunc = func(f *mc.FtpArgs) (mc.FileSystem, error) {
 			return fs, nil
 		}

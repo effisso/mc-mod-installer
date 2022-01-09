@@ -39,12 +39,11 @@ Examples:
 
 		if *listGroup != "" {
 			if *listClient {
-				return errors.New("Can't specify a group with the client switch")
+				return errors.New("Can't specify a server group with the client switch")
 			}
 			*listServer = true
-			err := NameValidator.ValidateServerGroups([]string{*listGroup})
-			if err != nil {
-				return err
+			if _, ok := mc.ServerGroups[*listGroup]; !ok {
+				return mc.NewUnknownGroupError(*listGroup)
 			}
 		}
 

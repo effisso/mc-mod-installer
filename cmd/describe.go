@@ -55,12 +55,11 @@ func init() {
 func describeMod(modName string) error {
 	cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
-	err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
-	if err != nil {
-		return err
+	m := cliMods[modName]
+	if m == nil {
+		return mc.NewUnknownModError(modName)
 	}
 
-	m := cliMods[modName]
 	printToUser(fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s",
 		m.FriendlyName, m.CliName, m.Description, m.DetailsURL, m.LatestURL))
 
@@ -68,14 +67,12 @@ func describeMod(modName string) error {
 }
 
 func describeGroup(groupName string) error {
-	err := NameValidator.ValidateServerGroups([]string{groupName})
-	if err != nil {
-		return err
+	group := mc.ServerGroups[groupName]
+	if group == nil {
+		return mc.NewUnknownGroupError(groupName)
 	}
 
-	m := mc.ServerGroups[groupName]
-
-	for _, mod := range m.Mods {
+	for _, mod := range group.Mods {
 		printToUser(mod.CliName)
 	}
 
@@ -85,12 +82,11 @@ func describeGroup(groupName string) error {
 func describeInstall(modName string) error {
 	cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
-	err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
-	if err != nil {
-		return err
+	m := cliMods[modName]
+	if m == nil {
+		return mc.NewUnknownModError(modName)
 	}
 
-	m := cliMods[modName]
 	i, exists := UserModConfig.ModInstallations[modName]
 
 	if exists {

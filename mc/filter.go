@@ -6,17 +6,13 @@ type ModFilter interface {
 	FilterAllMods(xGroups []string, xMods []string, cfg *UserModConfig, force bool) ([]*Mod, error)
 }
 
-type modFilter struct {
-	NameMapper    ModNameMapper
-	NameValidator NameValidator
+// NewModFilter returns a new instance which implements ModFilter
+func NewModFilter(mapper ModNameMapper) ModFilter {
+	return modFilter{NameMapper: mapper}
 }
 
-// NewModFilter returns a new instance which implements ModFilter
-func NewModFilter(mapper ModNameMapper, validator NameValidator) ModFilter {
-	return modFilter{
-		NameMapper:    mapper,
-		NameValidator: validator,
-	}
+type modFilter struct {
+	NameMapper ModNameMapper
 }
 
 // GetModsToInstall filters out mods as indicated by the user
@@ -25,15 +21,19 @@ func (f modFilter) FilterAllMods(xGroups []string, xMods []string, cfg *UserModC
 	xGroupSet := toSet(xGroups)
 	xModSet := toSet(xMods)
 
-	err := f.NameValidator.ValidateServerGroups(xGroups)
-	if err != nil {
-		return nil, err
+	// validate user-provided server group names
+	for _, group := range xGroups {
+		if _, exists := ServerGroups[group]; !exists {
+			return nil, NewUnknownGroupError(group)
+		}
 	}
 
+	// validate user-provided mod names
 	modMap := f.NameMapper.MapAllMods(cfg.ClientMods)
-	err = f.NameValidator.ValidateModCliNames(xMods, modMap)
-	if err != nil {
-		return nil, err
+	for _, name := range xMods {
+		if _, exists := modMap[name]; !exists {
+			return nil, NewUnknownModError(name)
+		}
 	}
 
 	for groupName, group := range ServerGroups {

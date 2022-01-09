@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("MC Path Cmd", func() {
 	var fs afero.Fs
-	var cfgIoFake *clientConfigIoSpy
+	var cfgIoSpy *clientConfigIoSpy
 	var outBuffer *bytes.Buffer
 
 	mcPathVal := "/some/path/to/.minecraft"
@@ -25,13 +25,11 @@ var _ = Describe("MC Path Cmd", func() {
 
 		cmd.ViperInstance.Set(mc.InstallPathKey, mcPathVal)
 
-		cfg := TestingConfig
-		cfg.ClientMods = TestingClientMods
-		cfgIoFake = &clientConfigIoSpy{
-			LoadReturn: cfg,
+		cfgIoSpy = &clientConfigIoSpy{
+			LoadReturn: TestingConfig,
 		}
 		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoFake
+			return cfgIoSpy
 		}
 
 		outBuffer = bytes.NewBufferString("")

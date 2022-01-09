@@ -1,7 +1,6 @@
 package mc_test
 
 import (
-	"errors"
 	"mcmods/mc"
 	. "mcmods/testdata"
 
@@ -11,28 +10,26 @@ import (
 
 var _ = Describe("Filter", func() {
 	var filter mc.ModFilter
-	var cfg *mc.UserModConfig
 	var emptyMapper *emptyNameMapper
-	var emptyValidator *emptyNameValidator
 
 	xEmpty := []string{}
 
 	BeforeEach(func() {
 		InitTestData()
 		mc.ServerGroups = TestingServerGroups
-		emptyValidator = &emptyNameValidator{}
-		emptyMapper = &emptyNameMapper{}
-		filter = mc.NewModFilter(emptyMapper, emptyValidator)
-		cfg = &mc.UserModConfig{
-			ModInstallations: map[string]mc.ModInstallation{},
-			ClientMods:       TestingClientMods,
-		}
+		emptyMapper = &emptyNameMapper{Map: TestingCliModMap}
+		filter = mc.NewModFilter(emptyMapper)
 	})
 
 	Context("exclusions", func() {
+		BeforeEach(func() {
+			// clear installed mods
+			TestingConfig.ModInstallations = map[string]mc.ModInstallation{}
+		})
+
 		When("no exclusions", func() {
 			It("returns all mods", func() {
-				mods, err := filter.FilterAllMods(xEmpty, xEmpty, cfg, false)
+				mods, err := filter.FilterAllMods(xEmpty, xEmpty, TestingConfig, false)
 
 				Expect(err).To(BeNil())
 				Expect(mods).To(ConsistOf(TestingAllMods))
@@ -41,7 +38,7 @@ var _ = Describe("Filter", func() {
 
 		When("server groups excluded", func() {
 			It("excludes the specified mods", func() {
-				mods, err := filter.FilterAllMods([]string{"performance", "optional"}, xEmpty, cfg, false)
+				mods, err := filter.FilterAllMods([]string{"performance", "optional"}, xEmpty, TestingConfig, false)
 
 				Expect(err).To(BeNil())
 				Expect(mods).NotTo(ContainElement(TestingServerPerformance1))
@@ -52,7 +49,8 @@ var _ = Describe("Filter", func() {
 		When("server mods excluded", func() {
 			It("excludes the specified mods", func() {
 				xServer := []string{TestingServerPerformance1.CliName, TestingServerOptional1.CliName}
-				mods, err := filter.FilterAllMods(xEmpty, xServer, cfg, false)
+
+				mods, err := filter.FilterAllMods(xEmpty, xServer, TestingConfig, false)
 
 				Expect(err).To(BeNil())
 				Expect(mods).To(HaveLen(len(TestingAllMods) - 2))
@@ -64,7 +62,8 @@ var _ = Describe("Filter", func() {
 		When("client mods excluded", func() {
 			It("excludes the specified mods", func() {
 				xClientMods := []string{TestingClientMod1.CliName, TestingClientMod2.CliName}
-				mods, err := filter.FilterAllMods(xEmpty, xClientMods, cfg, false)
+
+				mods, err := filter.FilterAllMods(xEmpty, xClientMods, TestingConfig, false)
 
 				Expect(err).To(BeNil())
 				Expect(mods).To(HaveLen(len(TestingAllMods) - 2))
@@ -72,16 +71,68 @@ var _ = Describe("Filter", func() {
 				Expect(mods).NotTo(ContainElement(TestingClientMod2))
 			})
 		})
+
+		When("validating server group names", func() {
+			It("should return no error for existing server group names", func() {
+				xServerGroups := []string{"performance"}
+
+				mods, err := filter.FilterAllMods(xServerGroups, xEmpty, TestingConfig, false)
+
+				Expect(err).To(BeNil())
+				Expect(mods).To(ConsistOf(
+					// no performance
+					TestingServerOnly1,
+					TestingServerRequired1,
+					TestingServerOptional1,
+					TestingClientMod1,
+					TestingClientMod2,
+				))
+			})
+
+			It("should return an error for unknown server group names", func() {
+				xServerGroups := []string{"invalid"}
+
+				_, err := filter.FilterAllMods(xServerGroups, xEmpty, TestingConfig, false)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
+
+		When("validating mod CLI names", func() {
+			It("should return no error for existing CLI names", func() {
+				xClientMods := []string{TestingClientMod2.CliName}
+
+				mods, err := filter.FilterAllMods(xEmpty, xClientMods, TestingConfig, false)
+
+				Expect(err).To(BeNil())
+				Expect(mods).To(ConsistOf(
+					// no client mod 2
+					TestingServerOnly1,
+					TestingServerRequired1,
+					TestingServerOptional1,
+					TestingServerPerformance1,
+					TestingClientMod1,
+				))
+			})
+
+			It("should return an error for unknown CLI names", func() {
+				xClientMods := []string{"invalid"}
+
+				_, err := filter.FilterAllMods(xEmpty, xClientMods, TestingConfig, false)
+
+				Expect(err).ToNot(BeNil())
+			})
+		})
 	})
 
 	Context("force", func() {
 		BeforeEach(func() {
 			install := mc.ModInstallation{DownloadURL: TestingClientMod1.LatestURL}
-			cfg.ModInstallations[TestingClientMod1.CliName] = install
+			TestingConfig.ModInstallations[TestingClientMod1.CliName] = install
 		})
 		When("false", func() {
 			It("doesn't return items with installations from the latest url", func() {
-				mods, err := filter.FilterAllMods(xEmpty, xEmpty, cfg, false)
+				mods, err := filter.FilterAllMods(xEmpty, xEmpty, TestingConfig, false)
 
 				Expect(err).To(BeNil())
 				Expect(mods).NotTo(ContainElement(TestingClientMod1))
@@ -89,16 +140,16 @@ var _ = Describe("Filter", func() {
 		})
 		When("true", func() {
 			It("returns items with installations from the latest url", func() {
-				mods, err := filter.FilterAllMods(xEmpty, xEmpty, cfg, true)
+				mods, err := filter.FilterAllMods(xEmpty, xEmpty, TestingConfig, true)
 
 				Expect(err).To(BeNil())
 				Expect(mods).To(ContainElement(TestingClientMod1))
 			})
 
 			It("does not return excluded items", func() {
-				xServer := []string{TestingServerPerformance1.CliName, TestingServerOptional1.CliName}
+				xServer := []string{"performance", "optional"}
 
-				mods, err := filter.FilterAllMods(xEmpty, xServer, cfg, true)
+				mods, err := filter.FilterAllMods(xServer, xEmpty, TestingConfig, true)
 
 				Expect(err).To(BeNil())
 				Expect(mods).To(HaveLen(len(TestingAllMods) - 2))
@@ -107,106 +158,7 @@ var _ = Describe("Filter", func() {
 			})
 		})
 	})
-
-	Context("name verification", func() {
-		Context("handles arguments correctly", func() {
-			var xServer, xClient []string
-			var nameMapper nameMapperValidator
-
-			BeforeEach(func() {
-				xServer = []string{TestingServerPerformance1.CliName, TestingServerOptional1.CliName}
-				xClient = []string{TestingClientMod1.CliName}
-				mapb := false
-				nameMapper = nameMapperValidator{
-					ClientMods:      TestingConfig.ClientMods,
-					emptyNameMapper: emptyNameMapper{Map: TestingCliModMap},
-					Visited:         &mapb,
-				}
-			})
-
-			It("validates names", func() {
-				groupb := false
-				modb := false
-				nmValidator := vNameValidator{
-					Groups:             xServer,
-					Mods:               xClient,
-					Map:                TestingCliModMap,
-					VisitedGroup:       &groupb,
-					VisitedMod:         &modb,
-					emptyNameValidator: emptyNameValidator{},
-				}
-				filter = mc.NewModFilter(nameMapper, nmValidator)
-
-				mods, err := filter.FilterAllMods(xServer, xClient, TestingConfig, false)
-
-				Expect(err).To(BeNil())
-				Expect(mods).To(Not(BeNil()))
-				Expect(*nmValidator.VisitedGroup).To(BeTrue())
-				Expect(*nameMapper.Visited).To(BeTrue())
-				Expect(*nmValidator.VisitedMod).To(BeTrue())
-			})
-		})
-
-		Context("on error", func() {
-			It("returns server groups validation error", func() {
-				(*emptyValidator).GroupsReturn = errors.New("group validation problem")
-
-				mods, err := filter.FilterAllMods([]string{"invalid"}, xEmpty, cfg, true)
-
-				Expect(err).To(Equal(emptyValidator.GroupsReturn))
-				Expect(mods).To(BeNil())
-			})
-
-			It("returns mod name validation error", func() {
-				emptyValidator.ModsReturn = errors.New("mod validation problem")
-
-				mods, err := filter.FilterAllMods(xEmpty, []string{"invalid"}, cfg, true)
-
-				Expect(err).To(Equal(emptyValidator.ModsReturn))
-				Expect(mods).To(BeNil())
-			})
-		})
-	})
 })
-
-// ----
-// Name Validator Mocks
-// ----
-
-type emptyNameValidator struct {
-	GroupsReturn error
-	ModsReturn   error
-}
-
-func (v emptyNameValidator) ValidateServerGroups(groups []string) error {
-	return v.GroupsReturn
-}
-
-func (v emptyNameValidator) ValidateModCliNames(namesToVerify []string, cliMods mc.ModMap) error {
-	return v.ModsReturn
-}
-
-type vNameValidator struct {
-	emptyNameValidator
-	Groups       []string
-	Mods         []string
-	Map          mc.ModMap
-	VisitedGroup *bool
-	VisitedMod   *bool
-}
-
-func (v vNameValidator) ValidateServerGroups(groups []string) error {
-	*(v.VisitedGroup) = true
-	Expect(groups).To(ConsistOf(v.Groups))
-	return v.GroupsReturn
-}
-
-func (v vNameValidator) ValidateModCliNames(namesToVerify []string, cliMods mc.ModMap) error {
-	*(v.VisitedMod) = true
-	Expect(namesToVerify).To(ConsistOf(v.Mods))
-	Expect(cliMods).To(Equal(v.Map))
-	return v.ModsReturn
-}
 
 // ----
 // Name Mapper Mocks

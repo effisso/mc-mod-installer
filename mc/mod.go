@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -39,6 +40,18 @@ func init() {
 	if err != nil {
 		panic(errors.New("server_mods.json file couldn't be unmarshalled"))
 	}
+}
+
+// NewUnknownModError creates a new error indicating that the mod name provided
+// by the user is not valid.
+func NewUnknownModError(name string) error {
+	return fmt.Errorf("Unknown Mod: %s", name)
+}
+
+// NewUnknownGroupError creates a new error indicating that the group name
+// provided by the user is not valid.
+func NewUnknownGroupError(name string) error {
+	return fmt.Errorf("Unknown Server Group: %s", name)
 }
 
 // Mod is a single downloadable JAR file representing a Minecraft mod

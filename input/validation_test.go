@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestMods(t *testing.T) {
+func TestInputs(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Input Suite")
 }
