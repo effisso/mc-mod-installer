@@ -112,7 +112,6 @@ func getMods(mods []*mc.Mod, apndTgt []*mc.Mod) []*mc.Mod {
 	for _, mod := range mods {
 		_, installed := UserModConfig.ModInstallations[mod.CliName]
 		if *listInstalled && installed || *listNotInstalled && !installed {
-
 			apndTgt = append(apndTgt, mod)
 		}
 	}
