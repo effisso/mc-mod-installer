@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"mcmods/browser"
+	"mcmods/mc"
 
 	"github.com/spf13/cobra"
 )
@@ -16,16 +17,19 @@ var visitCmd = &cobra.Command{
 	Short: "Open a browser to the mod's details URL",
 	Long: `
 Open a browser to the mod's details URL`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		modName := args[0]
 		cliMods := NameMapper.MapAllMods(UserModConfig.ClientMods)
 
-		err := NameValidator.ValidateModCliNames([]string{modName}, cliMods)
-		cobra.CheckErr(err)
-
 		m := cliMods[modName]
 
+		if m == nil {
+			return mc.NewUnknownModError(modName)
+		}
+
 		BrowserLauncher.Open(m.DetailsURL)
+
+		return nil
 	},
 }
 
