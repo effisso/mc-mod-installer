@@ -17,6 +17,10 @@ build-all-targets:
 
 test:
 	go test -v ./...
+
+coverage:
+	go test --coverprofile ./.coverage -v ./...
+	go tool cover -html ./.coverage
  
 run:
 	go build -o ${BINARY_NAME} main.go
