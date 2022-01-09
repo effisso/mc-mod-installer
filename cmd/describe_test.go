@@ -39,6 +39,7 @@ var _ = Describe("Describe Cmd", func() {
 				Map: TestingCliModMap,
 			},
 		}
+		cmd.NameMapper = mapValidator
 
 		groupb := false
 		modb := false
@@ -50,15 +51,13 @@ var _ = Describe("Describe Cmd", func() {
 			Map:                TestingCliModMap,
 			emptyNameValidator: emptyNameValidator{},
 		}
+		cmd.NameValidator = nameValidator
 
 		cfg := TestingConfig
 		cfg.ClientMods = TestingClientMods
 		cfgIoFake = &clientConfigIoSpy{
 			LoadReturn: cfg,
 		}
-
-		cmd.NameMapper = mapValidator
-		cmd.NameValidator = nameValidator
 		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
 			return cfgIoFake
 		}
