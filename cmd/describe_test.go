@@ -97,11 +97,16 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("describes the group", func() {
-			m := TestingServerRequired1
+			m1 := TestingServerRequired1
+			m2 := &mc.Mod{
+				CliName:     "second",
+				Description: "used to verify that multiple groups can be printed",
+			}
+			TestingServerGroups["required"].Mods = append(TestingServerGroups["required"].Mods, m2)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "group", "required"})
 
-			executeAndVerifyOutput(outBuffer, m.CliName, false)
+			executeAndVerifyOutput(outBuffer, m1.CliName+"\n"+m2.CliName, false)
 		})
 	})
 
