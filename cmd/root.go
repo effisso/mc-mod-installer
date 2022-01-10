@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"mcmods/mc"
 	"os"
@@ -21,9 +20,6 @@ var (
 	// UserModConfig contains information about mod installations on the file
 	// system
 	UserModConfig *mc.UserModConfig
-
-	// ToolVersion is the release version of the tool
-	ToolVersion string
 
 	// ViperInstance is the common instance of viper shared through the package
 	ViperInstance = viper.GetViper()
@@ -64,13 +60,6 @@ inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
 
 		UserModConfig, err = cfgIo.LoadOrNew()
 		cobra.CheckErr(err)
-	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if *printVersion {
-			fmt.Println(ToolVersion)
-			return nil
-		}
-		return errors.New("no arguments specified")
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		fs.Close()
@@ -146,6 +135,15 @@ func initViper() {
 	}
 }
 
+// Print the complete output of the command to a user. Does not append a new
+// line
 func printToUser(txt string) {
-	fmt.Fprintln(RootCmd.OutOrStdout(), txt)
+	fmt.Fprint(RootCmd.OutOrStdout(), txt)
+}
+
+// Print a line of output for the command to a user. Appends a new line.
+// Commands should conclude by calling printToUser to not append an empty
+// final empty line to the buffer
+func printLineToUser(txt string) {
+	printToUser(fmt.Sprintf("%s\n", txt))
 }

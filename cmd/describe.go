@@ -72,8 +72,13 @@ func describeGroup(groupName string) error {
 		return mc.NewUnknownGroupError(groupName)
 	}
 
-	for _, mod := range group.Mods {
-		printToUser(mod.CliName)
+	max := len(group.Mods) - 1
+	for i, mod := range group.Mods {
+		if i == max {
+			printToUser(mod.CliName)
+		} else {
+			printLineToUser(mod.CliName)
+		}
 	}
 
 	return nil

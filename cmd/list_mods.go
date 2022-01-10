@@ -54,13 +54,19 @@ Examples:
 
 		if *listServer {
 			for _, mod := range getServerMods() {
-				printToUser(mod.CliName)
+				printLineToUser(mod.CliName)
 			}
 		}
 
 		if *listClient {
-			for _, mod := range getClientMods() {
-				printToUser(mod.CliName)
+			mods := getClientMods()
+			max := len(mods) - 1
+			for i, mod := range mods {
+				if i == max {
+					printToUser(mod.CliName)
+				} else {
+					printLineToUser(mod.CliName)
+				}
 			}
 		}
 		return nil

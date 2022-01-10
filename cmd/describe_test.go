@@ -70,7 +70,7 @@ var _ = Describe("Describe Cmd", func() {
 
 		It("describes the mod", func() {
 			m := TestingClientMod1
-			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s\n",
+			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\n%s\nWebsite:  %s\nLatest package:  %s",
 				m.FriendlyName, m.CliName, m.Description, m.DetailsURL, m.LatestURL)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "mod", m.CliName})
@@ -98,11 +98,10 @@ var _ = Describe("Describe Cmd", func() {
 
 		It("describes the group", func() {
 			m := TestingServerRequired1
-			expectedOutput := fmt.Sprintf("%s\n", m.CliName)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "group", "required"})
 
-			executeAndVerifyOutput(outBuffer, expectedOutput, false)
+			executeAndVerifyOutput(outBuffer, m.CliName, false)
 		})
 	})
 
@@ -125,7 +124,7 @@ var _ = Describe("Describe Cmd", func() {
 
 		It("describes the install", func() {
 			m := TestingClientMod1
-			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\nInstall timestamp:  %s\nUp-to-date:  %t\n",
+			expectedOutput := fmt.Sprintf("\n%s (%s)\n-----\nInstall timestamp:  %s\nUp-to-date:  %t",
 				m.FriendlyName, m.CliName, "123", false)
 
 			cmd.RootCmd.SetArgs([]string{"describe", "install", TestingClientMod1.CliName})
@@ -134,7 +133,7 @@ var _ = Describe("Describe Cmd", func() {
 		})
 
 		It("informs when not installed", func() {
-			expectedOutput := fmt.Sprintf("Not Installed.\n")
+			expectedOutput := fmt.Sprintf("Not Installed.")
 
 			cmd.RootCmd.SetArgs([]string{"describe", "install", TestingServerOnly1.CliName})
 
@@ -164,8 +163,11 @@ func executeAndVerifyOutput(outBuffer io.Reader, expectedOutput string, lineOrde
 	if lineOrderMatters {
 		Expect(strOut).To(Equal(expectedOutput))
 	} else {
-		outLines := strings.Split(strOut, "\n")
-		expectedLines := strings.Split(expectedOutput, "\n")
+		newlineSplitFunc := func(c rune) bool {
+			return c == '\n'
+		}
+		outLines := strings.FieldsFunc(strOut, newlineSplitFunc)
+		expectedLines := strings.FieldsFunc(expectedOutput, newlineSplitFunc)
 
 		Expect(outLines).To(ConsistOf(expectedLines))
 	}

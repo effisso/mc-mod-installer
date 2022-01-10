@@ -40,7 +40,7 @@ var _ = Describe("MC Path Cmd", func() {
 	It("no arguments - prints the path in viper to the user", func() {
 		cmd.RootCmd.SetArgs([]string{"mcpath"})
 
-		executeAndVerifyOutput(outBuffer, mcPathVal+"\n", true)
+		executeAndVerifyOutput(outBuffer, mcPathVal, true)
 	})
 
 	It("set - updates viper with the new value", func() {
