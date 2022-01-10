@@ -24,6 +24,10 @@ var (
 	// ViperInstance is the common instance of viper shared through the package
 	ViperInstance = viper.GetViper()
 
+	// FtpTimeoutMs is the maximum amount of time for the FTP connection to
+	// succeed before giving up and returning an error
+	FtpTimeoutMs uint = 5000
+
 	fs        mc.FileSystem
 	cfgIo     mc.ModConfigIo
 	cfgFile   string
@@ -49,7 +53,7 @@ inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
 				Server:    ViperInstance.GetString(mc.FtpServerKey),
 				User:      ViperInstance.GetString(mc.FtpUserKey),
 				Pw:        ftpPw,
-				TimeoutMs: 5000,
+				TimeoutMs: FtpTimeoutMs,
 			}
 		}
 
