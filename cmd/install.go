@@ -74,15 +74,6 @@ command. Password is needed every time. `,
 	},
 }
 
-// ResetInstallVars is for testing
-func ResetInstallVars() {
-	*force = false
-	*fullServer = false
-	*clientOnly = false
-	*xMods = (*xMods)[:0]
-	*xGroups = (*xGroups)[:0]
-}
-
 func init() {
 	RootCmd.AddCommand(installCmd)
 

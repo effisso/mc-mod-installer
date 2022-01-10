@@ -22,6 +22,10 @@ var _ = Describe("Visit Cmd", func() {
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
 
+		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+			return mc.LocalFileSystem{Fs: fs}, nil
+		}
+
 		mapb := false
 		mapValidator = &nameMapperValidator{
 			ClientMods: TestingClientMods,

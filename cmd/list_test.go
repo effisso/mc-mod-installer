@@ -23,12 +23,16 @@ var _ = Describe("List Cmd", func() {
 		clientModOutput = strings.Join(TestingClientCliNames, "\n") + "\n"
 		serverModOutput = strings.Join(TestingServerCliNames, "\n") + "\n"
 
-		cmd.ResetListVars()
+		cmd.ResetVars()
 
 		mc.ServerGroups = TestingServerGroups
-		cmd.ResetInstallVars()
+
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
+
+		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+			return mc.LocalFileSystem{Fs: fs}, nil
+		}
 
 		cfgIoSpy = &clientConfigIoSpy{
 			LoadReturn: TestingConfig,

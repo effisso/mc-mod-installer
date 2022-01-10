@@ -89,15 +89,6 @@ func init() {
 	listGroup = flags.StringP("group", "g", "", "Show only mods from the specified group.")
 }
 
-// ResetListVars is used for testing
-func ResetListVars() {
-	*listInstalled = false
-	*listNotInstalled = false
-	*listClient = false
-	*listServer = false
-	*listGroup = ""
-}
-
 func getClientMods() []*mc.Mod {
 	return getMods(UserModConfig.ClientMods, []*mc.Mod{})
 }

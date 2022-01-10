@@ -112,11 +112,6 @@ func InitPrompts() {
 	GroupPrompt = input.NewLinePrompt(AddGroupNamePromptText, &input.GroupNameValidator{})
 }
 
-// for testing
-func ResetAddVars() {
-	*serverMod = false
-}
-
 func init() {
 	RootCmd.AddCommand(addCmd)
 

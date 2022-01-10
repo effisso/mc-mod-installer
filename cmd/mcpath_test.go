@@ -19,11 +19,15 @@ var _ = Describe("MC Path Cmd", func() {
 	mcPathVal := "/some/path/to/.minecraft"
 
 	BeforeEach(func() {
-		cmd.ResetPathVars()
+		cmd.ResetVars()
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
 
 		cmd.ViperInstance.Set(mc.InstallPathKey, mcPathVal)
+
+		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+			return mc.LocalFileSystem{Fs: fs}, nil
+		}
 
 		cfgIoSpy = &clientConfigIoSpy{
 			LoadReturn: TestingConfig,

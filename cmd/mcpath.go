@@ -38,14 +38,7 @@ Surround the path with double-quotes if it contains spaces. `,
 	},
 }
 
-// ResetPathVars is used for testing
-func ResetPathVars() {
-	*path = ""
-}
-
 func init() {
-	ResetAddVars()
-
 	RootCmd.AddCommand(pathCmd)
 
 	path = pathCmd.Flags().String("set", "", "Used to set the absolute path where Minecraft is installed: --set /path/to/.minecraft")

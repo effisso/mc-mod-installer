@@ -32,9 +32,13 @@ var _ = Describe("Add Cmd", func() {
 
 	BeforeEach(func() {
 		InitTestData()
+		mc.ServerGroups = TestingServerGroups
+
 		afs := afero.NewMemMapFs()
 		fs = &mc.LocalFileSystem{Fs: afs}
+
 		cmd.ViperInstance.SetFs(afs)
+		cmd.ResetVars()
 
 		mapb := false
 		mapValidator = &nameMapperValidator{
@@ -75,10 +79,6 @@ var _ = Describe("Add Cmd", func() {
 		cmd.DetailsUrlPrompt = detailURLNoOp
 		cmd.DownloadUrlPrompt = latestURLNoOp
 		cmd.GroupPrompt = groupNoOp
-
-		mc.ServerGroups = TestingServerGroups
-
-		cmd.ResetAddVars()
 
 		cmd.RootCmd.SetArgs([]string{"add"})
 	})
