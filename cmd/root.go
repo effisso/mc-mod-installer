@@ -24,13 +24,12 @@ var (
 	// ViperInstance is the common instance of viper shared through the package
 	ViperInstance = viper.GetViper()
 
-	fs           mc.FileSystem
-	cfgIo        mc.ModConfigIo
-	cfgFile      string
-	ftpUser      string
-	ftpPw        string
-	ftpServer    string
-	printVersion *bool
+	fs        mc.FileSystem
+	cfgIo     mc.ModConfigIo
+	cfgFile   string
+	ftpUser   string
+	ftpPw     string
+	ftpServer string
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -38,8 +37,8 @@ var RootCmd = &cobra.Command{
 	Use:   "mcmods",
 	Short: "Tool for installing/maintaining mods for the CDP YAMS server.",
 	Long: `
-This tool installs and updates mods on a machine for connecting to the CDP YAMS
-Minecraft server. The server is private, and only available by invite. To
+This tool installs and updates Minecraft mods for connecting to the server
+called CDP YAMS. The server is private, and only available by invite. To
 inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		var ftpArgs *mc.FtpArgs
@@ -47,9 +46,10 @@ inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
 
 		if ftpPw != "" {
 			ftpArgs = &mc.FtpArgs{
-				Server: ViperInstance.GetString(mc.FtpServerKey),
-				User:   ViperInstance.GetString(mc.FtpUserKey),
-				Pw:     ftpPw,
+				Server:    ViperInstance.GetString(mc.FtpServerKey),
+				User:      ViperInstance.GetString(mc.FtpUserKey),
+				Pw:        ftpPw,
+				TimeoutMs: 5000,
 			}
 		}
 
@@ -73,7 +73,7 @@ func Execute() {
 }
 
 func init() {
-	ResetRootVars()
+	ResetVars()
 
 	cobra.OnInitialize(initViper)
 
@@ -82,16 +82,6 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&ftpServer, "ftp-server", "", "The FTP server for managing server-side mods. Stored, only needed on the first command.")
 	RootCmd.PersistentFlags().StringVarP(&ftpUser, "user", "u", "", "The FTP username. Stored, only needed on the first command.")
 	RootCmd.PersistentFlags().StringVarP(&ftpPw, "password", "p", "", "The FTP password. Not stored, needed every time.")
-
-	printVersion = RootCmd.Flags().BoolP("version", "v", false, "Show the version of this tool.")
-}
-
-// ResetRootVars is only used for testing
-func ResetRootVars() {
-	cfgFile = ""
-	ftpUser = ""
-	ftpPw = ""
-	ftpServer = ""
 }
 
 // initViper reads in a config file through Viper
@@ -120,17 +110,17 @@ func initViper() {
 		}
 	}
 
-	updated := false
+	updatedCfg := false
 	if ftpUser != "" {
-		updated = true
+		updatedCfg = true
 		ViperInstance.Set(mc.FtpUserKey, ftpUser)
 	}
 	if ftpServer != "" {
-		updated = true
+		updatedCfg = true
 		ViperInstance.Set(mc.FtpServerKey, ftpServer)
 	}
 
-	if updated {
+	if updatedCfg {
 		ViperInstance.WriteConfig()
 	}
 }
@@ -146,4 +136,33 @@ func printToUser(txt string) {
 // final empty line to the buffer
 func printLineToUser(txt string) {
 	printToUser(fmt.Sprintf("%s\n", txt))
+}
+
+// ResetVars resets all vars to their default values for testing
+func ResetVars() {
+	// root cmd
+	cfgFile = ""
+	ftpUser = ""
+	ftpPw = ""
+	ftpServer = ""
+
+	// add cmd
+	*serverMod = false
+
+	// install cmd
+	*force = false
+	*fullServer = false
+	*clientOnly = false
+	*xMods = (*xMods)[:0]
+	*xGroups = (*xGroups)[:0]
+
+	// list mods cmd
+	*listInstalled = false
+	*listNotInstalled = false
+	*listClient = false
+	*listServer = false
+	*listGroup = ""
+
+	// mcpath cmd
+	*path = ""
 }
