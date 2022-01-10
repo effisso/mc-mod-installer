@@ -26,10 +26,16 @@ var _ = Describe("Local File System", func() {
 		mc.ViperInstance.Set(mc.InstallPathKey, mcInstallLoc)
 	})
 
-	It("NewFs returns a new file system with no ftp args", func() {
-		fs, err := mc.NewFs(nil)
-		Expect(fs).ToNot(BeNil())
-		Expect(err).To(BeNil())
+	Context("NewFs", func() {
+		It("returns a new local file system with no ftp args", func() {
+			lfs := &mc.LocalFileSystem{}
+
+			fs, err := mc.NewFs(nil)
+
+			Expect(fs).ToNot(BeNil())
+			Expect(err).To(BeNil())
+			Expect(fs).To(BeAssignableToTypeOf(lfs))
+		})
 	})
 
 	Context("WriteFile", func() {

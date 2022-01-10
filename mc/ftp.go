@@ -14,10 +14,24 @@ import (
 	"github.com/jlaffaye/ftp"
 )
 
+var (
+	// FTPDial is the function called when
+	FTPDial func(server string, opts ...ftp.DialOption) (FTPConnection, error) = liveFTPDial
+)
+
+// FTPConnection is a wrapper for the ftp funcs used to send and receive FTP data
+type FTPConnection interface {
+	Login(username string, password string) error
+	Stor(path string, r io.Reader) error
+	Retr(path string) (*ftp.Response, error)
+	MakeDir(dir string) error
+	Quit() error
+}
+
 // FtpFileSystem is used to interact with Minecraft FTP servers to maintain mod
 // installations.
 type FtpFileSystem struct {
-	Connection *ftp.ServerConn
+	Connection FTPConnection
 }
 
 // WriteFile writes the bytes over FTP to the given path on the server.
@@ -31,7 +45,7 @@ func (f FtpFileSystem) ReadFile(relPath string) ([]byte, error) {
 	r, err := f.Connection.Retr(fixPathForFtp(relPath))
 	if err == nil {
 		defer r.Close()
-		return ioutil.ReadAll(r)
+		return ioutil.ReadAll(r) // hard to unit test the happy path due to the library's architecture :(
 	} else if errors.As(err, &protoErr) {
 		if protoErr.Code == ftp.StatusFileUnavailable {
 			return nil, os.ErrNotExist
@@ -40,7 +54,7 @@ func (f FtpFileSystem) ReadFile(relPath string) ([]byte, error) {
 	return nil, err
 }
 
-// MkDirAll creates all non-existant folders in the given path with 0755 perms.
+// MkDirAll creates all non-existant folders in the given path.
 func (f FtpFileSystem) MkDirAll(relPath string) error {
 	for _, dir := range GetRecursiveDirs(fixPathForFtp(relPath)) {
 		if err := f.Connection.MakeDir(dir); err != nil {
@@ -84,7 +98,7 @@ type FtpArgs struct {
 	TimeoutMs uint
 }
 
-func openFtpToServer(args *FtpArgs) (*ftp.ServerConn, error) {
+func openFtpToServer(args *FtpArgs) (FTPConnection, error) {
 	if args.Pw == "" || args.User == "" || args.Server == "" {
 		return nil, errors.New("FTP access requires a username, password, and server")
 	}
@@ -93,7 +107,7 @@ func openFtpToServer(args *FtpArgs) (*ftp.ServerConn, error) {
 
 	timeoutOpt := ftp.DialWithTimeout(time.Duration(args.TimeoutMs) * time.Millisecond)
 
-	ftpConnection, err := ftp.Dial(args.Server, timeoutOpt)
+	ftpConnection, err := FTPDial(args.Server, timeoutOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -111,4 +125,8 @@ func openFtpToServer(args *FtpArgs) (*ftp.ServerConn, error) {
 func fixPathForFtp(path string) string {
 	ps := string(os.PathSeparator)
 	return "/" + strings.ReplaceAll(path, ps, "/")
+}
+
+func liveFTPDial(server string, opts ...ftp.DialOption) (FTPConnection, error) {
+	return ftp.Dial(server, opts...)
 }
