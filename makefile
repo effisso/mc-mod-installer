@@ -12,8 +12,8 @@ build-all-targets:
 	env GOOS=windows GOARCH=amd64 go build -o ${OUT_FOLDER}/win/${BINARY_NAME}.exe main.go
 	@echo env GOOS=linux GOARCH=arm64 go build -o ${OUT_FOLDER}/linux-arm/${BINARY_NAME} main.go
 	@echo env GOOS=linux GOARCH=amd64 go build -o ${OUT_FOLDER}/linux-amd/${BINARY_NAME} main.go
-	env GOOS=darwin GOARCH=arm64 go build -o ${OUT_FOLDER}/mac-arm/${BINARY_NAME} main.go
-	env GOOS=darwin GOARCH=amd64 go build -o ${OUT_FOLDER}/mac-amd/${BINARY_NAME} main.go
+	@echo env GOOS=darwin GOARCH=arm64 go build -o ${OUT_FOLDER}/mac-arm/${BINARY_NAME} main.go
+	@echo env GOOS=darwin GOARCH=amd64 go build -o ${OUT_FOLDER}/mac-amd/${BINARY_NAME} main.go
 
 test:
 	go test -v ./...
