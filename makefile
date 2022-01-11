@@ -39,6 +39,7 @@ clean:
 
 get-ci-deps:
 	sudo apt-get install -y zip
+	go mod download golang.org/x/lint
 	go install golang.org/x/lint/golint
 
 zip:
