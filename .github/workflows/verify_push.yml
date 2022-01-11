@@ -51,10 +51,12 @@ jobs:
 
             if (( $(echo "$totalCoverage $GREEN_THRESHOLD" | awk '{print ($1 >= $2)}') ))
                 echo "COV_COLOR=green" >> $GITHUB_ENV
-            elif (( $(echo "$totalCoverage $YELLOW_THRESHOLD" | awk '{print ($1 >= $2)}') ))
-                echo "COV_COLOR=yellow" >> $GITHUB_ENV
             else
-                echo "COV_COLOR=red" >> $GITHUB_ENV
+                if (( $(echo "$totalCoverage $YELLOW_THRESHOLD" | awk '{print ($1 >= $2)}') ))
+                    echo "COV_COLOR=yellow" >> $GITHUB_ENV
+                else
+                    echo "COV_COLOR=red" >> $GITHUB_ENV
+                fi
             fi
 
             # https://dev.to/thejaredwilcurt/coverage-badge-with-github-actions-finally-59fa;
