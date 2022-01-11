@@ -7,7 +7,6 @@ import (
 	"mcmods/mc"
 	"net/textproto"
 	"os"
-	"strings"
 
 	"github.com/jlaffaye/ftp"
 	. "github.com/onsi/ginkgo"
@@ -16,7 +15,7 @@ import (
 
 var _ = Describe("FTP File System", func() {
 	Describe("NewFs", func() {
-		var mock *mockFtp
+		var mock *mockFTP
 
 		BeforeEach(func() {
 			mock = emptyMock()
@@ -27,7 +26,7 @@ var _ = Describe("FTP File System", func() {
 
 		Context("missing FTP args", func() {
 			It("returns an error when username is empty", func() {
-				args := &mc.FtpArgs{Server: "server", Pw: "pw"}
+				args := &mc.FTPArgs{Server: "server", Pw: "pw"}
 
 				_, err := mc.NewFs(args)
 
@@ -35,7 +34,7 @@ var _ = Describe("FTP File System", func() {
 			})
 
 			It("returns an error when password is empty", func() {
-				args := &mc.FtpArgs{Server: "server", User: "user"}
+				args := &mc.FTPArgs{Server: "server", User: "user"}
 
 				_, err := mc.NewFs(args)
 
@@ -43,7 +42,7 @@ var _ = Describe("FTP File System", func() {
 			})
 
 			It("returns an error when server is empty", func() {
-				args := &mc.FtpArgs{User: "user", Pw: "pw"}
+				args := &mc.FTPArgs{User: "user", Pw: "pw"}
 
 				_, err := mc.NewFs(args)
 
@@ -52,8 +51,8 @@ var _ = Describe("FTP File System", func() {
 		})
 
 		It("dials and logs into ftp if given args", func() {
-			ftpfs := &mc.FtpFileSystem{}
-			args := &mc.FtpArgs{
+			ftpfs := &mc.FTPFileSystem{}
+			args := &mc.FTPArgs{
 				Server:    "<server>",
 				User:      "<usr>",
 				Pw:        "<pw>",
@@ -69,7 +68,7 @@ var _ = Describe("FTP File System", func() {
 
 		It("returns errors from ftp dial", func() {
 			dialErr := errors.New("dial error")
-			args := &mc.FtpArgs{
+			args := &mc.FTPArgs{
 				Server:    "<server>",
 				User:      "<usr>",
 				Pw:        "<pw>",
@@ -86,7 +85,7 @@ var _ = Describe("FTP File System", func() {
 
 		It("returns errors from ftp login", func() {
 			loginErr := errors.New("login error")
-			args := &mc.FtpArgs{
+			args := &mc.FTPArgs{
 				Server:    "<server>",
 				User:      "<usr>",
 				Pw:        "<pw>",
@@ -103,13 +102,13 @@ var _ = Describe("FTP File System", func() {
 	})
 
 	Describe("FTP File System", func() {
-		var ftpFs *mc.FtpFileSystem
-		var mock *mockFtp
+		var ftpFs *mc.FTPFileSystem
+		var mock *mockFTP
 		var r io.Reader
 
 		BeforeEach(func() {
 			mock = emptyMock()
-			ftpFs = &mc.FtpFileSystem{
+			ftpFs = &mc.FTPFileSystem{
 				Connection: mock,
 			}
 
@@ -118,11 +117,11 @@ var _ = Describe("FTP File System", func() {
 
 		Context("WriteFile", func() {
 			It("calls stor with the bytes and fixed path", func() {
-				relPath := "windows\\formatted\\path\\should\\be.converted"
+				relPath := `some/path/to/a.file`
 				called := false
 				mock.StorFunc = func(path string, r io.Reader) error {
 					called = true
-					Expect(path).To(Equal("/" + strings.ReplaceAll(relPath, "\\", "/")))
+					Expect(path).To(Equal("/" + relPath))
 					return nil
 				}
 
@@ -230,37 +229,10 @@ var _ = Describe("FTP File System", func() {
 				Expect(called).To(BeTrue())
 			})
 		})
-
-		// Context("GetRecursiveDirs", func() {
-		// 	It("Returns path hierarchy strings in order", func() {
-		// 		path := "/test/directory/hierarchy/test"
-		// 		expected := []string{
-		// 			"/test",
-		// 			"/test/directory",
-		// 			"/test/directory/hierarchy",
-		// 			path,
-		// 		}
-
-		// 		dirs := mc.GetRecursiveDirs(path)
-
-		// 		Expect(dirs).To(HaveLen(len(expected)))
-		// 		for i, dir := range dirs {
-		// 			Expect(dir).To(Equal(expected[i]))
-		// 		}
-		// 	})
-
-		// 	It("returns nil for root directories", func() {
-		// 		roots := []string{".", "/"}
-
-		// 		for _, root := range roots {
-		// 			Expect(mc.GetRecursiveDirs(root)).To(BeNil(), "didn't return nil for root: "+root)
-		// 		}
-		// 	})
-		// })
 	})
 })
 
-type mockFtp struct {
+type mockFTP struct {
 	LoginFunc   func(username string, password string) error
 	StorFunc    func(path string, r io.Reader) error
 	RetrFunc    func(path string) (*ftp.Response, error)
@@ -268,8 +240,8 @@ type mockFtp struct {
 	QuitFunc    func() error
 }
 
-func emptyMock() *mockFtp {
-	return &mockFtp{
+func emptyMock() *mockFTP {
+	return &mockFTP{
 		LoginFunc:   func(username string, password string) error { return nil },
 		StorFunc:    func(path string, r io.Reader) error { return nil },
 		RetrFunc:    func(path string) (*ftp.Response, error) { return &ftp.Response{}, nil },
@@ -278,23 +250,23 @@ func emptyMock() *mockFtp {
 	}
 }
 
-func (ftp mockFtp) Login(username string, password string) error {
+func (ftp mockFTP) Login(username string, password string) error {
 	return ftp.LoginFunc(username, password)
 }
 
-func (ftp mockFtp) Stor(path string, r io.Reader) error {
+func (ftp mockFTP) Stor(path string, r io.Reader) error {
 	return ftp.StorFunc(path, r)
 }
 
-func (ftp mockFtp) Retr(path string) (*ftp.Response, error) {
+func (ftp mockFTP) Retr(path string) (*ftp.Response, error) {
 	return ftp.RetrFunc(path)
 }
 
-func (ftp mockFtp) MakeDir(dir string) error {
+func (ftp mockFTP) MakeDir(dir string) error {
 	return ftp.MakeDirFunc(dir)
 }
 
-func (ftp mockFtp) Quit() error {
+func (ftp mockFTP) Quit() error {
 	return ftp.QuitFunc()
 }
 

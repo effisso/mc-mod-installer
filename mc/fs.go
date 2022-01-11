@@ -45,16 +45,16 @@ func (l LocalFileSystem) MkDirAll(relPath string) error {
 // Close is a no-op for the local file system
 func (l LocalFileSystem) Close() {}
 
-// NewFs creates an FtpFileSystem if the args indicate FTP, or else
+// NewFs creates an FTPFileSystem if the args indicate FTP, or else
 // a LocalFileSystem
-func NewFs(ftpArgs *FtpArgs) (FileSystem, error) {
+func NewFs(ftpArgs *FTPArgs) (FileSystem, error) {
 	var fs FileSystem
 	if ftpArgs != nil {
-		conn, err := openFtpToServer(ftpArgs)
+		conn, err := openFTPToServer(ftpArgs)
 		if err != nil {
 			return nil, err
 		}
-		fs = &FtpFileSystem{Connection: conn}
+		fs = &FTPFileSystem{Connection: conn}
 	} else {
 		fs = &LocalFileSystem{Fs: afero.NewOsFs()}
 	}

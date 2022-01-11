@@ -12,7 +12,7 @@ import (
 
 var (
 	// CreateFsFunc creates the file system for FTP/Local. Exported for testing
-	CreateFsFunc func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) = mc.NewFs
+	CreateFsFunc func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) = mc.NewFs
 
 	// ConfigIoFunc instantiates an interface for config file IO
 	ConfigIoFunc func(fs mc.FileSystem) mc.ModConfigIo = mc.NewUserModConfigIo
@@ -24,9 +24,9 @@ var (
 	// ViperInstance is the common instance of viper shared through the package
 	ViperInstance = viper.GetViper()
 
-	// FtpTimeoutMs is the maximum amount of time for the FTP connection to
+	// FTPTimeoutMs is the maximum amount of time for the FTP connection to
 	// succeed before giving up and returning an error
-	FtpTimeoutMs uint = 5000
+	FTPTimeoutMs uint = 5000
 
 	fs        mc.FileSystem
 	cfgIo     mc.ModConfigIo
@@ -45,15 +45,15 @@ This tool installs and updates Minecraft mods for connecting to the server
 called CDP YAMS. The server is private, and only available by invite. To
 inquire about an invite, please call 1-888-PISS-OFF and ask for Dianne.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		var ftpArgs *mc.FtpArgs
+		var ftpArgs *mc.FTPArgs
 		var err error
 
 		if ftpPw != "" {
-			ftpArgs = &mc.FtpArgs{
-				Server:    ViperInstance.GetString(mc.FtpServerKey),
-				User:      ViperInstance.GetString(mc.FtpUserKey),
+			ftpArgs = &mc.FTPArgs{
+				Server:    ViperInstance.GetString(mc.FTPServerKey),
+				User:      ViperInstance.GetString(mc.FTPUserKey),
 				Pw:        ftpPw,
-				TimeoutMs: FtpTimeoutMs,
+				TimeoutMs: FTPTimeoutMs,
 			}
 		}
 
@@ -117,11 +117,11 @@ func initViper() {
 	updatedCfg := false
 	if ftpUser != "" {
 		updatedCfg = true
-		ViperInstance.Set(mc.FtpUserKey, ftpUser)
+		ViperInstance.Set(mc.FTPUserKey, ftpUser)
 	}
 	if ftpServer != "" {
 		updatedCfg = true
-		ViperInstance.Set(mc.FtpServerKey, ftpServer)
+		ViperInstance.Set(mc.FTPServerKey, ftpServer)
 	}
 
 	if updatedCfg {

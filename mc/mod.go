@@ -17,11 +17,11 @@ const (
 	// InstallPathKey - The key in the Viper config which defines the full path to Minecraft on disk
 	InstallPathKey = "mcInstallPath"
 
-	// FtpUserKey - The key of the FTP username
-	FtpUserKey = "ftpUser"
+	// FTPUserKey - The key of the FTP username
+	FTPUserKey = "ftpUser"
 
-	// FtpServerKey - The key of the FTP username
-	FtpServerKey = "ftpServer"
+	// FTPServerKey - The key of the FTP username
+	FTPServerKey = "ftpServer"
 )
 
 var (

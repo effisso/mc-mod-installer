@@ -22,7 +22,7 @@ var _ = Describe("Visit Cmd", func() {
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
 
-		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
 			return mc.LocalFileSystem{Fs: fs}, nil
 		}
 

@@ -4,11 +4,13 @@ import (
 	"fmt"
 )
 
+// ModMap is shorthand for the common mapping of mod CLI name to mod definition
 type ModMap map[string]*Mod
 
 // ModNameMapper creates a map of mod CLI names to the mod definition
 type ModNameMapper interface {
-	// GetModMap returns a map of both client and server mod CLI names keyed to their mod definition
+	// GetModMap returns a map of both client and server mod CLI names keyed to their
+	// mod definition
 	MapAllMods(clientMods []*Mod) ModMap
 }
 
@@ -20,7 +22,7 @@ func NewModNameMapper() ModNameMapper {
 }
 
 // GetModMap returns a map of cli names keyed to their Jar definition
-func (_ modNameMapper) MapAllMods(clientMods []*Mod) ModMap {
+func (modNameMapper) MapAllMods(clientMods []*Mod) ModMap {
 	validNames := ModMap{}
 
 	for _, group := range ServerGroups {

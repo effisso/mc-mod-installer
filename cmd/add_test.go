@@ -62,7 +62,7 @@ var _ = Describe("Add Cmd", func() {
 		serverAddSaveFake = &serverAddSaveNoOp{}
 
 		cmd.ServerCfgSaver = serverAddSaveFake
-		cmd.CreateFsFunc = func(f *mc.FtpArgs) (mc.FileSystem, error) {
+		cmd.CreateFsFunc = func(f *mc.FTPArgs) (mc.FileSystem, error) {
 			return fs, nil
 		}
 
@@ -76,8 +76,8 @@ var _ = Describe("Add Cmd", func() {
 		cmd.FriendlyPrompt = friendlyNoOp
 		cmd.CliNamePrompt = cliNameNoOp
 		cmd.DescPrompt = descNoOp
-		cmd.DetailsUrlPrompt = detailURLNoOp
-		cmd.DownloadUrlPrompt = latestURLNoOp
+		cmd.DetailsURLPrompt = detailURLNoOp
+		cmd.DownloadURLPrompt = latestURLNoOp
 		cmd.GroupPrompt = groupNoOp
 
 		cmd.RootCmd.SetArgs([]string{"add"})
@@ -220,7 +220,7 @@ var _ = Describe("Add Cmd", func() {
 		var outBuffer *bytes.Buffer
 
 		BeforeEach(func() {
-			cmd.InitPrompts()
+			cmd.InitAddPrompts()
 			outBuffer = bytes.NewBufferString("")
 			inBuffer = bytes.NewBufferString("")
 		})

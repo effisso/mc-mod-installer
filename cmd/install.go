@@ -7,15 +7,23 @@ import (
 )
 
 const (
+	// ServerOnlyGroupKey is the name of the mod group for mods which should only
+	// be installed on the server
 	ServerOnlyGroupKey = "server-only"
 )
 
 var (
+	// CreateDownloaderFunc initializes the ModDownloader
 	CreateDownloaderFunc func(fs mc.FileSystem) mc.ModDownloader = CreateDefaultDownloader
 
+	// NameMapper creates a map of all mods to their CLI name
 	NameMapper = mc.NewModNameMapper()
-	Filter     = mc.NewModFilter(NameMapper)
-	Installer  = mc.NewModInstaller()
+
+	// Filter returns a subset of mods based on input parameters
+	Filter = mc.NewModFilter(NameMapper)
+
+	// Installer installs mods
+	Installer = mc.NewModInstaller()
 
 	force      *bool
 	fullServer *bool
@@ -98,6 +106,7 @@ func getServerModGroupNames(m map[string]*mc.ServerGroup) []string {
 	return keys
 }
 
+// CreateDefaultDownloader initializes a new mod downloader with a real HTTP Client
 func CreateDefaultDownloader(fs mc.FileSystem) mc.ModDownloader {
 	return mc.NewModDownloader(mc.NewHTTPClient(), fs)
 }

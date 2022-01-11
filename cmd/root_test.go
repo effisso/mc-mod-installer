@@ -24,7 +24,7 @@ var _ = Describe("Describe Cmd", func() {
 		fs = afero.NewMemMapFs()
 		mc.ServerGroups = TestingServerGroups
 
-		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
 			return mc.LocalFileSystem{Fs: fs}, nil
 		}
 
@@ -60,12 +60,12 @@ var _ = Describe("Describe Cmd", func() {
 			err := cmd.RootCmd.Execute()
 
 			Expect(err).To(BeNil())
-			Expect(cmd.ViperInstance.GetString(mc.FtpServerKey)).To(Equal(expectedServer))
-			Expect(cmd.ViperInstance.GetString(mc.FtpUserKey)).To(Equal(expectedUsername))
+			Expect(cmd.ViperInstance.GetString(mc.FTPServerKey)).To(Equal(expectedServer))
+			Expect(cmd.ViperInstance.GetString(mc.FTPUserKey)).To(Equal(expectedUsername))
 		})
 
 		It("passes ftp args to the CreateFsFunc", func() {
-			cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+			cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
 				Expect(ftpArgs.User).To(Equal(expectedUsername))
 				Expect(ftpArgs.Pw).To(Equal(expectedPassword))
 				Expect(ftpArgs.Server).To(Equal(expectedServer))

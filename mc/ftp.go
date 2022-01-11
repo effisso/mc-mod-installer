@@ -28,21 +28,21 @@ type FTPConnection interface {
 	Quit() error
 }
 
-// FtpFileSystem is used to interact with Minecraft FTP servers to maintain mod
+// FTPFileSystem is used to interact with Minecraft FTP servers to maintain mod
 // installations.
-type FtpFileSystem struct {
+type FTPFileSystem struct {
 	Connection FTPConnection
 }
 
 // WriteFile writes the bytes over FTP to the given path on the server.
-func (f FtpFileSystem) WriteFile(r io.Reader, relPath string) error {
-	return f.Connection.Stor(fixPathForFtp(relPath), r)
+func (f FTPFileSystem) WriteFile(r io.Reader, relPath string) error {
+	return f.Connection.Stor(fixPathForFTP(relPath), r)
 }
 
 // ReadFile reads the bytes of the given path over FTP.
-func (f FtpFileSystem) ReadFile(relPath string) ([]byte, error) {
+func (f FTPFileSystem) ReadFile(relPath string) ([]byte, error) {
 	protoErr := &textproto.Error{}
-	r, err := f.Connection.Retr(fixPathForFtp(relPath))
+	r, err := f.Connection.Retr(fixPathForFTP(relPath))
 	if err == nil {
 		defer r.Close()
 		return ioutil.ReadAll(r) // hard to unit test the happy path due to the library's architecture :(
@@ -55,8 +55,8 @@ func (f FtpFileSystem) ReadFile(relPath string) ([]byte, error) {
 }
 
 // MkDirAll creates all non-existant folders in the given path.
-func (f FtpFileSystem) MkDirAll(relPath string) error {
-	for _, dir := range GetRecursiveDirs(fixPathForFtp(relPath)) {
+func (f FTPFileSystem) MkDirAll(relPath string) error {
+	for _, dir := range GetRecursiveDirs(fixPathForFTP(relPath)) {
 		if err := f.Connection.MakeDir(dir); err != nil {
 			return err
 		}
@@ -65,7 +65,7 @@ func (f FtpFileSystem) MkDirAll(relPath string) error {
 }
 
 // Close calls Quit on the ftp connection
-func (f FtpFileSystem) Close() {
+func (f FTPFileSystem) Close() {
 	f.Connection.Quit()
 }
 
@@ -90,15 +90,15 @@ func GetRecursiveDirs(dir string) []string {
 	return dirs
 }
 
-// FtpArgs represents the information necessary to connect to FTP servers
-type FtpArgs struct {
+// FTPArgs represents the information necessary to connect to FTP servers
+type FTPArgs struct {
 	Server    string
 	User      string
 	Pw        string
 	TimeoutMs uint
 }
 
-func openFtpToServer(args *FtpArgs) (FTPConnection, error) {
+func openFTPToServer(args *FTPArgs) (FTPConnection, error) {
 	if args.Pw == "" || args.User == "" || args.Server == "" {
 		return nil, errors.New("FTP access requires a username, password, and server")
 	}
@@ -122,7 +122,7 @@ func openFtpToServer(args *FtpArgs) (FTPConnection, error) {
 	return ftpConnection, nil
 }
 
-func fixPathForFtp(path string) string {
+func fixPathForFTP(path string) string {
 	ps := string(os.PathSeparator)
 	return "/" + strings.ReplaceAll(path, ps, "/")
 }

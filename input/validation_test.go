@@ -64,7 +64,7 @@ var _ = Describe("Validations", func() {
 	})
 
 	Describe("URL Validator", func() {
-		var validator *input.UrlValidator
+		var validator *input.URLValidator
 		validUrls := []string{
 			"https://www.curseforge.com/minecraft/mc-mods/ducts/download/3571121/file",
 			"https://www.curseforge.com/minecraft/mc-mods/ducts",
@@ -74,7 +74,7 @@ var _ = Describe("Validations", func() {
 		}
 
 		BeforeEach(func() {
-			validator = &input.UrlValidator{}
+			validator = &input.URLValidator{}
 		})
 
 		It("should return no errors for valid URLs", func() {

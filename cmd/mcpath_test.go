@@ -25,7 +25,7 @@ var _ = Describe("MC Path Cmd", func() {
 
 		cmd.ViperInstance.Set(mc.InstallPathKey, mcPathVal)
 
-		cmd.CreateFsFunc = func(ftpArgs *mc.FtpArgs) (mc.FileSystem, error) {
+		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
 			return mc.LocalFileSystem{Fs: fs}, nil
 		}
 

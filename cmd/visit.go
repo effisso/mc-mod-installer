@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	// BrowserLauncher launches an internet browser
 	BrowserLauncher = browser.NewLauncher()
 )
 
