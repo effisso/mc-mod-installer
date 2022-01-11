@@ -1,8 +1,8 @@
 name: Release
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs: {}
 
 jobs:
   build:
@@ -34,25 +34,25 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
-    - name: upload linux arm
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/mcmods-linux-arm.tar.gz
-        asset_name: mcmods-linux-arm-${{ steps.version.outputs.version }}.tar.gz
-        asset_content_type: application/gzip
+    # - name: upload linux arm
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./out/mcmods-linux-arm.tar.gz
+    #     asset_name: mcmods-linux-arm-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_content_type: application/gzip
         
-    - name: upload linux amd
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/mcmods-linux-amd.tar.gz
-        asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
-        asset_content_type: application/gzip
+    # - name: upload linux amd
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./out/mcmods-linux-amd.tar.gz
+    #     asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_content_type: application/gzip
 
     - name: upload mac arm
       uses: actions/upload-release-asset@v1

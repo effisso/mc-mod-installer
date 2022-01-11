@@ -16,6 +16,6 @@
 
 out/
 mcmods
-.coverage
+coverage.out
 
 .vscode
