@@ -6,7 +6,7 @@ all: build test
 build:
 	go build -o ${BINARY_NAME} main.go
 
-build-release:  get-ci-deps build-all-targets test zip
+build-test-release:  get-ci-deps build-all-targets test zip
 
 build-all-targets:
 	env GOOS=windows GOARCH=amd64 go build -o ${OUT_FOLDER}/win/${BINARY_NAME}.exe main.go
@@ -17,6 +17,9 @@ build-all-targets:
 
 test:
 	go test -v ./...
+
+lint:
+	golint -set_exit_status ./...
 
 local-coverage:
 	go test --coverprofile coverage.out --covermode count -v ./...
@@ -41,5 +44,5 @@ zip:
 	zip -r ${OUT_FOLDER}/${BINARY_NAME}-windows.zip ${OUT_FOLDER}/win/${BINARY_NAME}.exe
 	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-arm.tar.gz ${OUT_FOLDER}/linux-arm/${BINARY_NAME}
 	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-amd.tar.gz ${OUT_FOLDER}/linux-amd/${BINARY_NAME}
-	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-arm.tar.gz ${OUT_FOLDER}/mac-arm/${BINARY_NAME}
-	tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-amd.tar.gz ${OUT_FOLDER}/mac-amd/${BINARY_NAME}
+	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-arm.tar.gz ${OUT_FOLDER}/mac-arm/${BINARY_NAME}
+	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-amd.tar.gz ${OUT_FOLDER}/mac-amd/${BINARY_NAME}
