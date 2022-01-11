@@ -39,6 +39,7 @@ clean:
 
 get-ci-deps:
 	sudo apt-get install -y zip
+	go install golang.org/x/lint/golint
 
 zip:
 	zip -r ${OUT_FOLDER}/${BINARY_NAME}-windows.zip ${OUT_FOLDER}/win/${BINARY_NAME}.exe
