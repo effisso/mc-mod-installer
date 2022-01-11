@@ -6,7 +6,7 @@ all: build test
 build:
 	go build -o ${BINARY_NAME} main.go
 
-build-test-release:  get-ci-deps build-all-targets test zip
+build-test-release: build-all-targets test zip
 
 build-all-targets:
 	env GOOS=windows GOARCH=amd64 go build -o ${OUT_FOLDER}/win/${BINARY_NAME}.exe main.go
