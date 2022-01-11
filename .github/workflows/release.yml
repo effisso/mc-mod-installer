@@ -54,25 +54,25 @@ jobs:
     #     asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
     #     asset_content_type: application/gzip
 
-    - name: upload mac arm
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/mcmods-mac-arm.tar.gz
-        asset_name: mcmods-mac-arm-${{ steps.version.outputs.version }}.tar.gz
-        asset_content_type: application/gzip
+    # - name: upload mac arm
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./out/mcmods-mac-arm.tar.gz
+    #     asset_name: mcmods-mac-arm-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_content_type: application/gzip
 
-    - name: upload mac amd
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./out/mcmods-mac-amd.tar.gz
-        asset_name: mcmods-mac-amd-${{ steps.version.outputs.version }}.tar.gz
-        asset_content_type: application/gzip
+    # - name: upload mac amd
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ github.token }}
+    #   with:
+    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+    #     asset_path: ./out/mcmods-mac-amd.tar.gz
+    #     asset_name: mcmods-mac-amd-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_content_type: application/gzip
 
     - name: upload windows
       uses: actions/upload-release-asset@v1
