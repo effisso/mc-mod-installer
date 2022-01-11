@@ -1,0 +1,66 @@
+name: Verify Push
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+
+    - name: Lint
+      run: golint -set_exit_status ./...
+
+    - name: Vet
+      run: go vet ./...
+
+    - name: Build
+      run: make build
+
+    - name: Unit Tests
+      run: make ci-coverage
+
+    - name: Quality Gate - Test Coverage
+        # https://medium.com/citihub/how-to-set-up-a-test-coverage-threshold-in-go-and-github-167f69b940dc
+      env:
+          TESTCOVERAGE_THRESHOLD: 80
+          GREEN_THRESHOLD: 90
+          YELLOW_THRESHOLD: 80
+      run: |
+            echo "Quality Gate: checking that test coverage is above threshold"
+            echo "Threshold             : $TESTCOVERAGE_THRESHOLD %"
+            totalCoverage=`go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+'`
+            echo "Current test coverage : $totalCoverage %"
+            echo "COVERAGE=$totalCoverage" >> $GITHUB_ENV
+            if (( $(echo "$totalCoverage $TESTCOVERAGE_THRESHOLD" | awk '{print ($1 > $2)}') )); then
+                echo "OK"
+            else
+                echo "Current test coverage is below the minimum allowed for this repo. Add more tests."
+                echo "Failed!"
+                exit 1
+            fi
+
+            if (( $(echo "$totalCoverage $GREEN_THRESHOLD" | awk '{print ($1 >= $2)}') ))
+                echo "COV_COLOR=green" >> $GITHUB_ENV
+            elif (( $(echo "$totalCoverage $YELLOW_THRESHOLD" | awk '{print ($1 >= $2)}') ))
+                echo "COV_COLOR=yellow" >> $GITHUB_ENV
+            else
+                echo "COV_COLOR=red" >> $GITHUB_ENV
+            fi
+
+    - name: Create Coverage Badge
+        # https://github.com/marketplace/actions/dynamic-badges
+      uses: schneegans/dynamic-badges-action@v1.0.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 075519841620519e9a42b32df632553b
+        filename: mc-mod-installer__${{ env.BRANCH }}.json
+        label: Test Coverage
+        message: ${{ env.COVERAGE }}
+        color: ${{ env.COV_COLOR }}
