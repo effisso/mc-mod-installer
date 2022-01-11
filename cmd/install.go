@@ -7,31 +7,36 @@ import (
 )
 
 const (
+	// ServerOnlyGroupKey is the name of the mod group for mods which should only
+	// be installed on the server
 	ServerOnlyGroupKey = "server-only"
 )
 
 var (
-	NameValidator = mc.NewNameValidator()
-	NameMapper    = mc.NewModNameMapper()
-	Filter        = mc.NewModFilter(NameMapper, NameValidator)
-	Installer     = mc.NewModInstaller()
-	Downloader    = mc.NewModDownloader()
+	// CreateDownloaderFunc initializes the ModDownloader
+	CreateDownloaderFunc func(fs mc.FileSystem) mc.ModDownloader = CreateDefaultDownloader
 
-	force      = newBoolPtr(false)
-	fullServer = newBoolPtr(false)
-	clientOnly = newBoolPtr(false)
-	xMods      = []string{}
-	xGroups    = []string{}
+	// NameMapper creates a map of all mods to their CLI name
+	NameMapper = mc.NewModNameMapper()
+
+	// Filter returns a subset of mods based on input parameters
+	Filter = mc.NewModFilter(NameMapper)
+
+	// Installer installs mods
+	Installer = mc.NewModInstaller()
+
+	force      *bool
+	fullServer *bool
+	clientOnly *bool
+	xMods      *[]string
+	xGroups    *[]string
 )
 
 // installCmd represents the install command
-var installCmd = NewInstallCmd()
-
-func NewInstallCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "install",
-		Short: "Installs and updates mod packages on the local machine.",
-		Long: `
+var installCmd = &cobra.Command{
+	Use:   "install",
+	Short: "Installs and updates mod packages on the local machine.",
+	Long: `
 Install is used to initialize and update mod installations with this tool.
 
 Users unfamiliar with configuring mods are encouraged to do a plain install
@@ -42,45 +47,39 @@ For advanced users wanting to use a custom set of performance-related mods or
 those who simply don't want the optional mods on their machine, see the --help
 command to read about filtering.
 
-To perform a server install, use the --full-server option with nothing else:
- $ install --full-server`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if !*fullServer {
-				if *clientOnly {
-					xGroups = getServerModGroupNames(mc.ServerGroups)
-				} else {
-					xGroups = append(xGroups, ServerOnlyGroupKey)
-				}
+To perform a server install, use the --full-server option the FTP info:
+  $ install --full-server --user <ftp-user> --password <pw> --server <server>
+
+The FTP server and user are stored, so they're only needed on the first
+command. Password is needed every time. `,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if !*fullServer {
+			if *clientOnly {
+				*xGroups = getServerModGroupNames(mc.ServerGroups)
+			} else {
+				*xGroups = append(*xGroups, ServerOnlyGroupKey)
 			}
+		}
 
-			mods, err := Filter.FilterAllMods(xGroups, xMods, InstallConfig, *force)
-			if err != nil {
-				return err
-			}
+		mods, err := Filter.FilterAllMods(*xGroups, *xMods, UserModConfig, *force)
+		if err != nil {
+			return err
+		}
 
-			err = Installer.InstallMods(Downloader, mods, InstallConfig)
-			if err != nil {
-				return err
-			}
+		dl := CreateDownloaderFunc(fs)
+		err = Installer.InstallMods(dl, mods, UserModConfig)
+		if err != nil {
+			return err
+		}
 
-			err = ConfigIo.Save(InstallConfig)
-			if err != nil {
-				return err
-			}
+		err = cfgIo.Save(UserModConfig)
+		if err != nil {
+			return err
+		}
 
-			printToUser("Install completed.")
-			return nil
-		},
-	}
-}
-
-// for testing
-func ResetInstallVars() {
-	*force = false
-	*fullServer = false
-	*clientOnly = false
-	xMods = xMods[:0]
-	xGroups = xGroups[:0]
+		printToUser("Install completed.")
+		return nil
+	},
 }
 
 func init() {
@@ -88,15 +87,15 @@ func init() {
 
 	flags := installCmd.Flags()
 
-	flags.BoolVarP(clientOnly, "client-only", "c", false, "Only install your client mods.")
+	clientOnly = flags.BoolP("client-only", "c", false, "Only install your client mods.")
 
-	flags.BoolVarP(force, "force", "f", false, "Force the download and install, even if the file exists.")
+	force = flags.BoolP("force", "f", false, "Force the download and install, even if the file exists.")
 
-	flags.BoolVar(fullServer, "full-server", false, "Install all the server mods. Only necessary for the server itself. Ignores exclude flags.")
+	fullServer = flags.Bool("full-server", false, "Install all the server mods. Only necessary for the server itself. Ignores exclude flags.")
 
-	flags.StringSliceVar(&xMods, "x-mod", []string{}, "Exclude specific Mods from the install (client or server). Specify multiple mods by separating the names with commas, no spaces.")
+	xMods = flags.StringSlice("x-mod", []string{}, "Exclude specific Mods from the install (client or server). Specify multiple mods by separating the names with commas, no spaces.")
 
-	flags.StringSliceVarP(&xGroups, "x-group", "x", []string{}, "Exclude Server Mod Groups from the install. The 'server-only' group is automatically excluded. Specify multiple mods by separating the names with commas, no spaces.")
+	xGroups = flags.StringSliceP("x-group", "x", []string{}, "Exclude Server Mod Groups from the install. The 'server-only' group is automatically excluded. Specify multiple mods by separating the names with commas, no spaces.")
 }
 
 func getServerModGroupNames(m map[string]*mc.ServerGroup) []string {
@@ -107,12 +106,7 @@ func getServerModGroupNames(m map[string]*mc.ServerGroup) []string {
 	return keys
 }
 
-func newBoolPtr(val bool) *bool {
-	b := val
-	return &b
-}
-
-func newStrPtr() *string {
-	s := ""
-	return &s
+// CreateDefaultDownloader initializes a new mod downloader with a real HTTP Client
+func CreateDefaultDownloader(fs mc.FileSystem) mc.ModDownloader {
+	return mc.NewModDownloader(mc.NewHTTPClient(), fs)
 }

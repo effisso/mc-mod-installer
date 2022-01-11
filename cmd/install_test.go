@@ -19,22 +19,34 @@ func TestCmds(t *testing.T) {
 
 var _ = Describe("Install Cmd", func() {
 	var fs afero.Fs
-	var cfgIoFake *clientConfigIoSpy
+	var cfgIoSpy *clientConfigIoSpy
+	var dl mc.ModDownloader
 
 	BeforeEach(func() {
 		InitTestData()
 		mc.ServerGroups = TestingServerGroups
-		cmd.ResetInstallVars()
+		cmd.ResetVars()
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
 
+		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
+			return mc.LocalFileSystem{Fs: fs}, nil
+		}
+
 		b := false
-		cfgIoFake = &clientConfigIoSpy{
+		cfgIoSpy = &clientConfigIoSpy{
 			Saved:      &b,
 			LoadReturn: TestingConfig,
 		}
 
-		cmd.ConfigIo = cfgIoFake
+		dl = &fakeDownloader{}
+		cmd.CreateDownloaderFunc = func(fs mc.FileSystem) mc.ModDownloader {
+			return dl
+		}
+
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoSpy
+		}
 	})
 
 	Context("verify filter, install, and save config", func() {
@@ -58,7 +70,7 @@ var _ = Describe("Install Cmd", func() {
 			bf := false
 			// verifies args passed to the installer
 			verifyInstaller = &installerVerifier{
-				Downloader: cmd.Downloader,
+				Downloader: dl,
 				Cfg:        TestingConfig,
 				Mods:       []*mc.Mod{},
 				Visited:    &bf,
@@ -73,7 +85,7 @@ var _ = Describe("Install Cmd", func() {
 
 		When("no args", func() {
 			It("adds server-only to the list of groups to exclude", func() {
-				verifyFilter.XGroups = []string{"server-only"}
+				verifyFilter.XGroups = []string{cmd.ServerOnlyGroupKey}
 				verifyFilter.Return = append(TestingClientMods, TestingServerOptional1, TestingServerPerformance1, TestingServerRequired1)
 				verifyInstaller.Mods = verifyFilter.Return
 				cmd.RootCmd.SetArgs([]string{"install"})
@@ -83,7 +95,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -96,7 +108,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -110,16 +122,34 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoFake.Saved).To(BeTrue())
+				Expect(*cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
-		It("returns error from save", func() {
-			cfgIoFake.SaveErr = errors.New("save err")
+		It("returns error from filtering", func() {
+			badGroup := "not-real-group"
+			verifyFilter.Err = errors.New("filter err")
+			verifyFilter.XGroups = []string{badGroup, cmd.ServerOnlyGroupKey}
+			cmd.RootCmd.SetArgs([]string{"install", "--x-group", badGroup})
+
+			err := cmd.RootCmd.Execute()
+			Expect(err).To(Equal(verifyFilter.Err))
+		})
+
+		It("returns error from installing", func() {
+			verifyInstaller.Return = errors.New("install err")
 			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
 
 			err := cmd.RootCmd.Execute()
-			Expect(err).To(Equal(cfgIoFake.SaveErr))
+			Expect(err).To(Equal(verifyInstaller.Return))
+		})
+
+		It("returns error from saving", func() {
+			cfgIoSpy.SaveErr = errors.New("save err")
+			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
+
+			err := cmd.RootCmd.Execute()
+			Expect(err).To(Equal(cfgIoSpy.SaveErr))
 		})
 	})
 	Context("client install", func() {
@@ -194,7 +224,7 @@ var _ = Describe("Install Cmd", func() {
 				})
 
 				It("adds server-only to the group exclusion list", func() {
-					filter.XGroups = []string{"performance", "server-only"}
+					filter.XGroups = []string{"performance", cmd.ServerOnlyGroupKey}
 					cmd.RootCmd.SetArgs([]string{"install", "--x-group", "performance"})
 
 					err := cmd.RootCmd.Execute()
@@ -204,7 +234,7 @@ var _ = Describe("Install Cmd", func() {
 				})
 
 				It("excludes the mods exclusion list", func() {
-					filter.XGroups = []string{"server-only"}
+					filter.XGroups = []string{cmd.ServerOnlyGroupKey}
 					filter.XMods = []string{TestingClientMod1.CliName}
 					cmd.RootCmd.SetArgs([]string{"install", "--x-mod", TestingClientMod1.CliName})
 
@@ -214,6 +244,20 @@ var _ = Describe("Install Cmd", func() {
 					Expect(*filter.Visited).To(BeTrue(), "mods not filtered")
 				})
 			})
+		})
+	})
+
+	Context("CreateDefaultDownloader", func() {
+		It("returns an initialized downloader", func() {
+			mcfs := mc.LocalFileSystem{Fs: fs}
+			dl := cmd.CreateDefaultDownloader(mcfs)
+
+			Expect(dl).ToNot(BeNil())
+
+			concrete := dl.(*mc.ModDownloaderImpl)
+
+			Expect(concrete.Fs).ToNot(BeNil())
+			Expect(concrete.HTTPClient).ToNot(BeNil())
 		})
 	})
 })
@@ -228,7 +272,7 @@ type emptyFilter struct {
 	Err    error
 }
 
-func (f emptyFilter) FilterAllMods(xGroups []string, xMods []string, cfg *mc.ClientModConfig, force bool) ([]*mc.Mod, error) {
+func (f emptyFilter) FilterAllMods(xGroups []string, xMods []string, cfg *mc.UserModConfig, force bool) ([]*mc.Mod, error) {
 	return f.Return, f.Err
 }
 
@@ -237,12 +281,12 @@ type filterVerifier struct {
 	emptyFilter
 	XGroups []string
 	XMods   []string
-	Cfg     *mc.ClientModConfig
+	Cfg     *mc.UserModConfig
 	Force   bool
 	Visited *bool
 }
 
-func (f filterVerifier) FilterAllMods(xGroups []string, xMods []string, cfg *mc.ClientModConfig, force bool) ([]*mc.Mod, error) {
+func (f filterVerifier) FilterAllMods(xGroups []string, xMods []string, cfg *mc.UserModConfig, force bool) ([]*mc.Mod, error) {
 	*(f.Visited) = true
 	Expect(xGroups).To(ConsistOf(f.XGroups))
 	Expect(xMods).To(ConsistOf(f.XMods))
@@ -260,7 +304,7 @@ type emptyInstaller struct {
 	Return error
 }
 
-func (i emptyInstaller) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.ClientModConfig) error {
+func (i emptyInstaller) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.UserModConfig) error {
 	return i.Return
 }
 
@@ -269,11 +313,11 @@ type installerVerifier struct {
 	emptyInstaller
 	Downloader mc.ModDownloader
 	Mods       []*mc.Mod
-	Cfg        *mc.ClientModConfig
+	Cfg        *mc.UserModConfig
 	Visited    *bool
 }
 
-func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.ClientModConfig) error {
+func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.Mod, cfg *mc.UserModConfig) error {
 	*(i.Visited) = true
 	Expect(downloader).To(Equal(i.Downloader))
 	Expect(mods).To(ConsistOf(i.Mods))
@@ -286,17 +330,27 @@ func (i installerVerifier) InstallMods(downloader mc.ModDownloader, mods []*mc.M
 // ----
 
 type clientConfigIoSpy struct {
-	LoadReturn *mc.ClientModConfig
+	LoadReturn *mc.UserModConfig
 	LoadErr    error
 	Saved      *bool
 	SaveErr    error
 }
 
-func (i clientConfigIoSpy) LoadOrNew() (*mc.ClientModConfig, error) {
+func (i clientConfigIoSpy) LoadOrNew() (*mc.UserModConfig, error) {
 	return i.LoadReturn, i.LoadErr
 }
 
-func (i clientConfigIoSpy) Save(cfg *mc.ClientModConfig) error {
+func (i clientConfigIoSpy) Save(cfg *mc.UserModConfig) error {
 	*(i.Saved) = true
 	return i.SaveErr
+}
+
+// ----
+// Downloader
+// ----
+
+type fakeDownloader struct{}
+
+func (fakeDownloader) Download(mod *mc.Mod, relPath string) error {
+	return nil
 }

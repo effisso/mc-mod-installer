@@ -2,20 +2,7 @@ package mc
 
 import (
 	"fmt"
-	"net/http"
 	"path/filepath"
-
-	"github.com/spf13/afero"
-)
-
-var (
-	// File system to use when reading/writing in the mc package
-	FileSystem = afero.NewOsFs()
-	Http       = &HttpClient{
-		Getter: &http.Client{
-			CheckRedirect: CheckRedirect,
-		},
-	}
 )
 
 // ModDownloader is the interface for downloading mods
@@ -24,51 +11,36 @@ type ModDownloader interface {
 	Download(mod *Mod, filePath string) error
 }
 
-type modDownloader struct{}
+// ModDownloaderImpl only exported for testing access. Use ModDownloader interface
+type ModDownloaderImpl struct {
+	Fs         FileSystem
+	HTTPClient *HTTPClient
+}
 
-// NewDownloader creates a new instance of a struct which implements Downloader
-func NewModDownloader() ModDownloader {
-	return modDownloader{}
+// NewModDownloader creates a new instance of a struct which implements Downloader
+// over the given http client
+func NewModDownloader(hc *HTTPClient, fs FileSystem) ModDownloader {
+	return &ModDownloaderImpl{
+		Fs:         fs,
+		HTTPClient: hc,
+	}
 }
 
 // Download the specified mod from its LatestUrl and save it to the location specified
-func (d modDownloader) Download(mod *Mod, filePath string) error {
-	err := FileSystem.MkdirAll(filepath.Dir(filePath), 0755)
+func (d ModDownloaderImpl) Download(mod *Mod, relPath string) error {
+	err := d.Fs.MkDirAll(filepath.Dir(relPath))
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("  Downloading %s\n    to: %s\n", mod.LatestUrl, filePath)
+	fmt.Printf("  Downloading %s\n    to: %s\n", mod.LatestURL, relPath)
 
-	resp, err := Http.Getter.Get(mod.LatestUrl)
+	resp, err := d.HTTPClient.Getter.Get(mod.LatestURL)
 	if err != nil {
 		return err
 	}
 
 	defer resp.Body.Close()
 
-	err = afero.WriteReader(FileSystem, filePath, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// CheckRedirect makes redirects are followed. Only exported for testing
-func CheckRedirect(r *http.Request, _ []*http.Request) error {
-	r.URL.Opaque = r.URL.Path
-	return nil
-}
-
-type HttpGet interface {
-	Get(url string) (*http.Response, error)
-}
-
-type HttpClient struct {
-	Getter HttpGet
-}
-
-func (h *HttpClient) GetRequest(url string) (*http.Response, error) {
-	return h.Getter.Get(url)
+	return d.Fs.WriteFile(resp.Body, relPath)
 }

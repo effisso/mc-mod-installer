@@ -32,7 +32,7 @@ var (
 	TestingClientCliNames []string
 	TestingServerCliNames []string
 
-	TestingConfig *mc.ClientModConfig
+	TestingConfig *mc.UserModConfig
 )
 
 func InitTestData() {
@@ -40,15 +40,15 @@ func InitTestData() {
 		FriendlyName: "client mod 1",
 		CliName:      "mod1",
 		Description:  "mod 1 description",
-		DetailsUrl:   "https://mod_1_dot_com",
-		LatestUrl:    "https://mod_1_dot_com/latest",
+		DetailsURL:   "https://mod_1_dot_com",
+		LatestURL:    "https://mod_1_dot_com/latest",
 	}
 	TestingClientMod2 = &mc.Mod{
 		FriendlyName: "client mod #2",
 		CliName:      "modtwo",
 		Description:  "description of the great mod 2",
-		DetailsUrl:   "https://second_mod_dot_gov",
-		LatestUrl:    "https://second_mod_dot_gov/latest",
+		DetailsURL:   "https://second_mod_dot_gov",
+		LatestURL:    "https://second_mod_dot_gov/latest",
 	}
 	TestingClientMods = []*mc.Mod{TestingClientMod1, TestingClientMod2}
 
@@ -56,29 +56,29 @@ func InitTestData() {
 		FriendlyName: "REQUIRED mod",
 		CliName:      "required1",
 		Description:  "REQUIRED mod description",
-		DetailsUrl:   "https://som_mod_site/mod-name",
-		LatestUrl:    "https://some_mod_site/download/123",
+		DetailsURL:   "https://som_mod_site/mod-name",
+		LatestURL:    "https://some_mod_site/download/123",
 	}
 	TestingServerPerformance1 = &mc.Mod{
 		FriendlyName: "performance mod",
 		CliName:      "perf1",
 		Description:  "performance mod description",
-		DetailsUrl:   "https://some_mod_site/another-mod-name",
-		LatestUrl:    "https://some_mod_site/download/547",
+		DetailsURL:   "https://some_mod_site/another-mod-name",
+		LatestURL:    "https://some_mod_site/download/547",
 	}
 	TestingServerOptional1 = &mc.Mod{
 		FriendlyName: "optional mod",
 		CliName:      "opt1",
 		Description:  "optional mod description",
-		DetailsUrl:   "https://mod_site/a-mod",
-		LatestUrl:    "https://mod_site/a-mod/a-mod-9.8.7",
+		DetailsURL:   "https://mod_site/a-mod",
+		LatestURL:    "https://mod_site/a-mod/a-mod-9.8.7",
 	}
 	TestingServerOnly1 = &mc.Mod{
 		FriendlyName: "server-only mod",
 		CliName:      "svr1",
 		Description:  "server-only mod description",
-		DetailsUrl:   "https://modzone/server-mod",
-		LatestUrl:    "https://modzone/server-mod/owiefaijdfaj/492834",
+		DetailsURL:   "https://modzone/server-mod",
+		LatestURL:    "https://modzone/server-mod/owiefaijdfaj/492834",
 	}
 
 	TestingGroupRequired = &mc.ServerGroup{
@@ -149,14 +149,14 @@ func InitTestData() {
 		TestingServerRequired1.CliName,
 	}
 
-	TestingConfig = &mc.ClientModConfig{
+	TestingConfig = &mc.UserModConfig{
 		ModInstallations: map[string]mc.ModInstallation{
 			TestingClientMod1.CliName: mc.ModInstallation{
-				DownloadUrl: "dummy_url",
+				DownloadURL: "dummy_url",
 				Timestamp:   "123",
 			},
 			TestingServerRequired1.CliName: mc.ModInstallation{
-				DownloadUrl: TestingServerRequired1.LatestUrl,
+				DownloadURL: TestingServerRequired1.LatestURL,
 				Timestamp:   "789",
 			},
 		},

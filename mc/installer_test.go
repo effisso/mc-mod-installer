@@ -14,7 +14,7 @@ import (
 
 var _ = Describe("Installer", func() {
 	var installer mc.ModInstaller
-	var cfg *mc.ClientModConfig
+	var cfg *mc.UserModConfig
 	var singleMod []*mc.Mod
 
 	installLoc := "/test/path"
@@ -24,7 +24,7 @@ var _ = Describe("Installer", func() {
 		singleMod = []*mc.Mod{TestingClientMod1}
 		mc.ServerGroups = TestingServerGroups
 		installer = mc.NewModInstaller()
-		cfg = &mc.ClientModConfig{
+		cfg = &mc.UserModConfig{
 			ModInstallations: map[string]mc.ModInstallation{},
 			ClientMods:       []*mc.Mod{},
 		}
@@ -34,7 +34,7 @@ var _ = Describe("Installer", func() {
 
 	It("passes correct args to the downloader", func() {
 		dl := verifyingDownloader{
-			ExpectedPath: filepath.Join(installLoc, mc.ModsFolderName, TestingClientMod1.CliName+".jar"),
+			ExpectedPath: filepath.Join(mc.ModFolderName, TestingClientMod1.CliName+".jar"),
 			ExpectedMod:  TestingClientMod1,
 		}
 
@@ -76,8 +76,8 @@ var _ = Describe("Installer", func() {
 	})
 })
 
-func verifyInstall(mod *mc.Mod, cfg *mc.ClientModConfig, nowText string) {
+func verifyInstall(mod *mc.Mod, cfg *mc.UserModConfig, nowText string) {
 	install := cfg.ModInstallations[mod.CliName]
-	Expect(install.DownloadUrl).To(Equal(mod.LatestUrl))
+	Expect(install.DownloadURL).To(Equal(mod.LatestURL))
 	Expect(install.Timestamp).To(Equal(nowText))
 }

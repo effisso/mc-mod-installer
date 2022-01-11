@@ -2,6 +2,7 @@ package input_test
 
 import (
 	"fmt"
+	"mcmods/cmd"
 	"mcmods/input"
 	"mcmods/mc"
 	. "mcmods/testdata"
@@ -11,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestMods(t *testing.T) {
+func TestInputs(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Input Suite")
 }
@@ -63,7 +64,7 @@ var _ = Describe("Validations", func() {
 	})
 
 	Describe("URL Validator", func() {
-		var validator *input.UrlValidator
+		var validator *input.URLValidator
 		validUrls := []string{
 			"https://www.curseforge.com/minecraft/mc-mods/ducts/download/3571121/file",
 			"https://www.curseforge.com/minecraft/mc-mods/ducts",
@@ -73,7 +74,7 @@ var _ = Describe("Validations", func() {
 		}
 
 		BeforeEach(func() {
-			validator = &input.UrlValidator{}
+			validator = &input.URLValidator{}
 		})
 
 		It("should return no errors for valid URLs", func() {
@@ -136,7 +137,7 @@ var _ = Describe("Validations", func() {
 		})
 
 		It("should return nil if the name is valid", func() {
-			groups := []string{"required", "optional", "performance", "server-only"}
+			groups := []string{"required", "optional", "performance", cmd.ServerOnlyGroupKey}
 
 			for _, name := range groups {
 				err := validator.Validate(name)

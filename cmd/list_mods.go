@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	listInstalled    = newBoolPtr(false)
-	listNotInstalled = newBoolPtr(false)
-	listClient       = newBoolPtr(false)
-	listServer       = newBoolPtr(false)
-	listGroup        = newStrPtr()
+	listInstalled    *bool
+	listNotInstalled *bool
+	listClient       *bool
+	listServer       *bool
+	listGroup        *string
 )
 
 // modCmd represents the mod command
@@ -39,12 +39,11 @@ Examples:
 
 		if *listGroup != "" {
 			if *listClient {
-				return errors.New("Can't specify a group with the client switch")
+				return errors.New("Can't specify a server group with the client switch")
 			}
 			*listServer = true
-			err := NameValidator.ValidateServerGroups([]string{*listGroup})
-			if err != nil {
-				return err
+			if _, ok := mc.ServerGroups[*listGroup]; !ok {
+				return mc.NewUnknownGroupError(*listGroup)
 			}
 		}
 
@@ -55,16 +54,19 @@ Examples:
 
 		if *listServer {
 			for _, mod := range getServerMods() {
-				if mod == nil {
-					continue
-				}
-				printToUser(mod.CliName)
+				printLineToUser(mod.CliName)
 			}
 		}
 
 		if *listClient {
-			for _, mod := range getClientMods() {
-				printToUser(mod.CliName)
+			mods := getClientMods()
+			max := len(mods) - 1
+			for i, mod := range mods {
+				if i == max {
+					printToUser(mod.CliName)
+				} else {
+					printLineToUser(mod.CliName)
+				}
 			}
 		}
 		return nil
@@ -76,28 +78,19 @@ func init() {
 
 	flags := modCmd.Flags()
 
-	flags.BoolVarP(listInstalled, "installed", "i", false, "Show only mods that are installed currently.")
+	listInstalled = flags.BoolP("installed", "i", false, "Show only mods that are installed currently.")
 
-	flags.BoolVarP(listNotInstalled, "not-installed", "n", false, "Show only mods that are not installed currently.")
+	listNotInstalled = flags.BoolP("not-installed", "n", false, "Show only mods that are not installed currently.")
 
-	flags.BoolVarP(listClient, "client", "c", false, "Show only client mods.")
+	listClient = flags.BoolP("client", "c", false, "Show only client mods.")
 
-	flags.BoolVarP(listServer, "server", "s", false, "Show only server mods.")
+	listServer = flags.BoolP("server", "s", false, "Show only server mods.")
 
-	flags.StringVarP(listGroup, "group", "g", "", "Show only mods from the specified group.")
-}
-
-// for testing
-func ResetListVars() {
-	*listInstalled = false
-	*listNotInstalled = false
-	*listClient = false
-	*listServer = false
-	*listGroup = ""
+	listGroup = flags.StringP("group", "g", "", "Show only mods from the specified group.")
 }
 
 func getClientMods() []*mc.Mod {
-	return getMods(InstallConfig.ClientMods, []*mc.Mod{})
+	return getMods(UserModConfig.ClientMods, []*mc.Mod{})
 }
 
 func getServerMods() []*mc.Mod {
@@ -114,9 +107,8 @@ func getServerMods() []*mc.Mod {
 
 func getMods(mods []*mc.Mod, apndTgt []*mc.Mod) []*mc.Mod {
 	for _, mod := range mods {
-		_, installed := InstallConfig.ModInstallations[mod.CliName]
+		_, installed := UserModConfig.ModInstallations[mod.CliName]
 		if *listInstalled && installed || *listNotInstalled && !installed {
-
 			apndTgt = append(apndTgt, mod)
 		}
 	}

@@ -8,22 +8,37 @@ import (
 )
 
 const (
-	AddFriendlyPromptText  = "What's the mod's name?\n> "
-	AddCliNamePromptText   = "Globally unique name (lowercase letters and hyphens only; short yet descriptive)\n> "
-	AddDescPromptText      = "Description of the mod (optional)\n> "
-	AddDetailUrlPromptText = "Mod homepage/wiki URL\n> "
-	AddDownloadPromptText  = "Desired package download URL\n> "
-	AddGroupNamePromptText = "Server group\n> "
+	addFriendlyPromptText  = "What's the mod's name?\n> "
+	addCliNamePromptText   = "Globally unique name (lowercase letters and hyphens only; short yet descriptive)\n> "
+	addDescPromptText      = "Description of the mod (optional)\n> "
+	addDetailURLPromptText = "Mod homepage/wiki URL\n> "
+	addDownloadPromptText  = "Desired package download URL\n> "
+	addGroupNamePromptText = "Server group\n> "
 )
 
 var (
-	FriendlyPrompt    input.Prompt
-	CliNamePrompt     input.Prompt
-	DescPrompt        input.Prompt
-	DetailsUrlPrompt  input.Prompt
-	DownloadUrlPrompt input.Prompt
-	GroupPrompt       input.Prompt
+	// FriendlyPrompt asks the user for a human-friendly name for the mod
+	FriendlyPrompt input.Prompt
 
+	// CliNamePrompt asks the user for a short, concise hyphenated name to
+	// refer to the mod in CLI commands
+	CliNamePrompt input.Prompt
+
+	// DescPrompt prompts the user for a description of the mod
+	DescPrompt input.Prompt
+
+	// DetailsURLPrompt asks the user for a link to the mods homepage/wiki
+	DetailsURLPrompt input.Prompt
+
+	// DownloadURLPrompt asks the user for a link to the location where the
+	// current version of the mod should be downloaded from
+	DownloadURLPrompt input.Prompt
+
+	// GroupPrompt prompts the user which group the mod should go in when
+	// adding a new server mod
+	GroupPrompt input.Prompt
+
+	// ServerCfgSaver saves the server config (for building new versions of this tool)
 	ServerCfgSaver mc.ServerConfigSaver
 
 	serverMod *bool
@@ -42,7 +57,7 @@ server-side mod when building new versions of the tool itself by using the
 All inputs for the mod information are collected interactively during
 execution.`,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		var friendlyName, cliName, desc, detUrl, dlUrl, groupName string
+		var friendlyName, cliName, desc, detURL, dlURL, groupName string
 
 		out := cmd.OutOrStdout()
 		in := cmd.InOrStdin()
@@ -59,11 +74,11 @@ execution.`,
 			return
 		}
 
-		if detUrl, err = DetailsUrlPrompt.GetInput(out, in); err != nil {
+		if detURL, err = DetailsURLPrompt.GetInput(out, in); err != nil {
 			return
 		}
 
-		if dlUrl, err = DownloadUrlPrompt.GetInput(out, in); err != nil {
+		if dlURL, err = DownloadURLPrompt.GetInput(out, in); err != nil {
 			return
 		}
 
@@ -71,8 +86,8 @@ execution.`,
 			FriendlyName: friendlyName,
 			CliName:      cliName,
 			Description:  desc,
-			DetailsUrl:   detUrl,
-			LatestUrl:    dlUrl,
+			DetailsURL:   detURL,
+			LatestURL:    dlURL,
 		}
 
 		if *serverMod {
@@ -83,8 +98,8 @@ execution.`,
 			mc.ServerGroups[groupName].Mods = append(mc.ServerGroups[groupName].Mods, mod)
 			err = ServerCfgSaver.Save()
 		} else {
-			InstallConfig.ClientMods = append(InstallConfig.ClientMods, mod)
-			err = ConfigIo.Save(InstallConfig)
+			UserModConfig.ClientMods = append(UserModConfig.ClientMods, mod)
+			err = cfgIo.Save(UserModConfig)
 		}
 
 		if err == nil {
@@ -95,26 +110,22 @@ execution.`,
 	},
 }
 
-func InitPrompts() {
-	FriendlyPrompt = input.NewLinePrompt(AddFriendlyPromptText, input.NoOpValidator{})
+// InitAddPrompts initializes all the prompts for the add command
+func InitAddPrompts() {
+	FriendlyPrompt = input.NewLinePrompt(addFriendlyPromptText, input.NoOpValidator{})
 
 	cliNameRegexValidator := input.NewRegexValidator(`^[a-z]+[a-z-]*[a-z]+$`,
 		"must be two or more lowercase letters a-z; can include hyphens in between")
 	cliNameUniqueValidator := &input.CliNameUniquenessValidator{GetModMap: getModMap}
-	CliNamePrompt = input.NewLinePrompt(AddCliNamePromptText, cliNameRegexValidator, cliNameUniqueValidator)
+	CliNamePrompt = input.NewLinePrompt(addCliNamePromptText, cliNameRegexValidator, cliNameUniqueValidator)
 
-	DescPrompt = input.NewLinePrompt(AddDescPromptText, input.NoOpValidator{})
+	DescPrompt = input.NewLinePrompt(addDescPromptText, input.NoOpValidator{})
 
-	DetailsUrlPrompt = input.NewLinePrompt(AddDetailUrlPromptText, &input.UrlValidator{})
+	DetailsURLPrompt = input.NewLinePrompt(addDetailURLPromptText, &input.URLValidator{})
 
-	DownloadUrlPrompt = input.NewLinePrompt(AddDownloadPromptText, &input.UrlValidator{})
+	DownloadURLPrompt = input.NewLinePrompt(addDownloadPromptText, &input.URLValidator{})
 
-	GroupPrompt = input.NewLinePrompt(AddGroupNamePromptText, &input.GroupNameValidator{})
-}
-
-// for testing
-func ResetAddVars() {
-	*serverMod = false
+	GroupPrompt = input.NewLinePrompt(addGroupNamePromptText, &input.GroupNameValidator{})
 }
 
 func init() {
@@ -122,13 +133,11 @@ func init() {
 
 	flags := addCmd.Flags()
 
-	serverMod = newBoolPtr(false)
+	serverMod = flags.Bool("server", false, "Add a new mod to the server config. Only allowed when building new versions of this tool.")
 
-	flags.BoolVar(serverMod, "server", false, "Add a new mod to the server config. Only allowed when building new versions of this tool.")
-
-	InitPrompts()
+	InitAddPrompts()
 }
 
 func getModMap() mc.ModMap {
-	return NameMapper.MapAllMods(InstallConfig.ClientMods)
+	return NameMapper.MapAllMods(UserModConfig.ClientMods)
 }

@@ -13,8 +13,14 @@ var listGroupsCmd = &cobra.Command{
 	Long: `
 Prints out all the valid group names.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, group := range getServerModGroupNames(mc.ServerGroups) {
-			printToUser(group)
+		groupNames := getServerModGroupNames(mc.ServerGroups)
+		max := len(groupNames) - 1
+		for i, group := range groupNames {
+			if i == max {
+				printToUser(group)
+			} else {
+				printLineToUser(group)
+			}
 		}
 	},
 }

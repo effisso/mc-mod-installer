@@ -44,34 +44,4 @@ var _ = Describe("CLI", func() {
 			Fail("Did not panic with duplicate names")
 		})
 	})
-
-	Describe("Name Validator", func() {
-		var validator mc.NameValidator
-
-		BeforeEach(func() {
-			validator = mc.NewNameValidator()
-		})
-
-		When("validating server group names", func() {
-			It("should return no error for existing server group names", func() {
-				Expect(validator.ValidateServerGroups([]string{"performance", "optional"})).To(BeNil())
-			})
-
-			It("should return an error for unknown server group names", func() {
-				Expect(validator.ValidateServerGroups([]string{"required", "invalid"})).To(Not(BeNil()))
-			})
-		})
-
-		When("validating mod CLI names", func() {
-			It("should return no error for existing CLI names", func() {
-				err := validator.ValidateModCliNames([]string{TestingClientMod1.CliName, TestingClientMod2.CliName}, TestingCliModMap)
-				Expect(err).To(BeNil())
-			})
-
-			It("should return an error for unknown CLI names", func() {
-				err := validator.ValidateModCliNames([]string{TestingClientMod1.CliName, "invalid"}, TestingCliModMap)
-				Expect(err).To(Not(BeNil()))
-			})
-		})
-	})
 })

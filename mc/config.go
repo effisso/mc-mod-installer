@@ -1,50 +1,55 @@
 package mc
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
-
-	"github.com/spf13/afero"
 )
 
 const (
+	// ModConfigFileName is the default name of the user config file
 	ModConfigFileName = "mcmods-install.json"
 )
 
-// ClientModConfig contains data about the mods installed by the tool on the system and custom client-only definitions of mods
-type ClientModConfig struct {
+// UserModConfig contains data about the mods installed by the tool on the
+// system and custom client-only definitions of mods
+type UserModConfig struct {
 	ModInstallations map[string]ModInstallation `json:"modInstallations"`
 	ClientMods       []*Mod                     `json:"clientMods"`
 }
 
 // ModConfigIo interface for loading and saving the local installation config
 type ModConfigIo interface {
-	// LoadOrNew loads the JSON file and parses it, or returns a new config instance if not found
-	LoadOrNew() (*ClientModConfig, error)
+	// LoadOrNew loads the JSON file and parses it, or returns a new config
+	// instance if not found
+	LoadOrNew() (*UserModConfig, error)
 
 	// Save the config as JSON
-	Save(cfg *ClientModConfig) error
+	Save(cfg *UserModConfig) error
 }
 
-type modConfigIo struct{}
-
-func NewModConfigIo() ModConfigIo {
-	return modConfigIo{}
+type modConfigIo struct {
+	Fs FileSystem
 }
 
-func NewModConfig() ClientModConfig {
-	return ClientModConfig{
+// NewUserModConfigIo returns a new interface for reading/writing mod config
+func NewUserModConfigIo(fs FileSystem) ModConfigIo {
+	return modConfigIo{Fs: fs}
+}
+
+// NewUserModConfig returns a new config with fields initialized and empty
+func NewUserModConfig() UserModConfig {
+	return UserModConfig{
 		ModInstallations: map[string]ModInstallation{},
 		ClientMods:       []*Mod{},
 	}
 }
 
 // LoadOrNew loads the JSON file and parses it, or returns a new config instance if not found
-func (m modConfigIo) LoadOrNew() (*ClientModConfig, error) {
-	cfgPath := installConfigPath()
-	cfg := &ClientModConfig{}
-	bytes, err := afero.ReadFile(FileSystem, cfgPath)
+func (m modConfigIo) LoadOrNew() (*UserModConfig, error) {
+	cfg := &UserModConfig{}
+	bytes, err := m.Fs.ReadFile(relUserConfigPath())
 
 	if err == nil {
 		err = json.Unmarshal(bytes, cfg)
@@ -61,20 +66,21 @@ func (m modConfigIo) LoadOrNew() (*ClientModConfig, error) {
 }
 
 // Save the config as JSON
-func (m modConfigIo) Save(cfg *ClientModConfig) error {
-	cfgPath := installConfigPath()
-	bytes, err := json.MarshalIndent(cfg, "", "\t")
+func (m modConfigIo) Save(cfg *UserModConfig) error {
+	b, err := json.MarshalIndent(cfg, "", "\t")
 	if err != nil {
-		return err // uncovered code :( don't know how to test this
+		return err // not sure how to test :/
 	}
 
-	return afero.WriteFile(FileSystem, cfgPath, bytes, 0644)
+	return m.Fs.WriteFile(bytes.NewReader(b), relUserConfigPath())
 }
 
-func installConfigPath() string {
-	return filepath.Join(RootDir(), ModConfigFileName)
+func relUserConfigPath() string {
+	return filepath.Join(ModFolderName, ModConfigFileName)
 }
 
+// ServerConfigSaver saves the server mod JSON file which is embedded in this
+// tool on build.
 type ServerConfigSaver interface {
 	Save() error
 }

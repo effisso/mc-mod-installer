@@ -2,7 +2,6 @@ package mc_test
 
 import (
 	"mcmods/mc"
-	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -15,13 +14,13 @@ func TestMods(t *testing.T) {
 }
 
 var _ = Describe("Mod", func() {
-	Describe("Root Path", func() {
-		It("should be built from the mc install location in Viper", func() {
+	Describe("Install Path", func() {
+		It("should be read from the mc install location in Viper", func() {
 			pathValue := "/some/path"
-			expected := filepath.Join(pathValue, mc.ModsFolderName)
+
 			mc.ViperInstance.Set(mc.InstallPathKey, pathValue)
 
-			Expect(mc.RootDir()).To(Equal(expected))
+			Expect(mc.GetInstallPath()).To(Equal(pathValue))
 		})
 	})
 })

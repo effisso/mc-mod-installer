@@ -2,7 +2,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"errors"
 	"mcmods/cmd"
 	"mcmods/mc"
 	. "mcmods/testdata"
@@ -17,40 +16,30 @@ var _ = Describe("List Cmd", func() {
 	var fs afero.Fs
 	var outBuffer *bytes.Buffer
 	var clientModOutput, serverModOutput string
-	var nameValidator *vNameValidator
-	var cfgIoFake *clientConfigIoSpy
+	var cfgIoSpy *clientConfigIoSpy
 
 	BeforeEach(func() {
 		InitTestData()
 		clientModOutput = strings.Join(TestingClientCliNames, "\n") + "\n"
 		serverModOutput = strings.Join(TestingServerCliNames, "\n") + "\n"
 
-		cmd.ResetListVars()
+		cmd.ResetVars()
 
 		mc.ServerGroups = TestingServerGroups
-		cmd.ResetInstallVars()
+
 		fs = afero.NewMemMapFs()
 		cmd.ViperInstance.SetFs(fs)
 
-		cfg := TestingConfig
-		cfg.ClientMods = TestingClientMods
-		cfgIoFake = &clientConfigIoSpy{
-			LoadReturn: cfg,
+		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
+			return mc.LocalFileSystem{Fs: fs}, nil
 		}
 
-		groupb := false
-		modb := false
-		nameValidator = &vNameValidator{
-			Groups:             []string{},
-			Mods:               []string{},
-			VisitedGroup:       &groupb,
-			VisitedMod:         &modb,
-			Map:                TestingCliModMap,
-			emptyNameValidator: emptyNameValidator{},
+		cfgIoSpy = &clientConfigIoSpy{
+			LoadReturn: TestingConfig,
 		}
-
-		cmd.NameValidator = nameValidator
-		cmd.ConfigIo = cfgIoFake
+		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+			return cfgIoSpy
+		}
 
 		outBuffer = bytes.NewBufferString("")
 
@@ -171,21 +160,17 @@ var _ = Describe("List Cmd", func() {
 			invalidGroup := "invalid"
 
 			It("returns an error when the group name is invalid", func() {
-				nameValidator.Groups = []string{invalidGroup}
-				nameValidator.GroupsReturn = errors.New("invalid group name")
 				cmd.RootCmd.SetArgs([]string{"list", "mods", "--group", invalidGroup})
 
 				err := cmd.RootCmd.Execute()
 
-				Expect(err).To(Equal(nameValidator.GroupsReturn))
+				Expect(err).ToNot(BeNil())
 			})
 
 			It("shows only mods from the specified server group", func() {
-				nameValidator.Groups = []string{requiredGroupName}
 				cmd.RootCmd.SetArgs([]string{"list", "mods", "--group", requiredGroupName})
 
 				executeAndVerifyOutput(outBuffer, TestingServerRequired1.CliName+"\n", false)
-				Expect(*nameValidator.VisitedGroup).To(BeTrue())
 			})
 
 			It("returns an error when combined with the client switch", func() {
@@ -197,7 +182,6 @@ var _ = Describe("List Cmd", func() {
 			})
 
 			It("displays only mods in the group, even with the server switch", func() {
-				nameValidator.Groups = []string{requiredGroupName}
 				cmd.RootCmd.SetArgs([]string{"list", "mods", "--group", requiredGroupName, "--server"})
 
 				executeAndVerifyOutput(outBuffer, TestingServerRequired1.CliName+"\n", false)
