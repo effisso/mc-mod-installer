@@ -75,6 +75,6 @@ jobs:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 075519841620519e9a42b32df632553b
         filename: mc-mod-installer__${{ env.BRANCH }}.json
-        label: Test Coverage
-        message: ${{ env.COVERAGE }}
+        label: Code Coverage
+        message: ${{ env.COVERAGE }}%
         color: ${{ env.COV_COLOR }}
