@@ -1,7 +1,6 @@
 package cmd_test
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,25 +11,14 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/afero"
 )
 
 var _ = Describe("Describe Cmd", func() {
-	var fs afero.Fs
-	var outBuffer *bytes.Buffer
-
+	var td *rootTestData
 	var mapValidator *nameMapperValidator
-	var cfgIoSpy *clientConfigIoSpy
 
 	BeforeEach(func() {
-		InitTestData()
-		mc.ServerGroups = TestingServerGroups
-		fs = afero.NewMemMapFs()
-		cmd.ViperInstance.SetFs(fs)
-
-		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
-			return mc.LocalFileSystem{Fs: fs}, nil
-		}
+		td = rootCmdTestSetup()
 
 		mapb := false
 		mapValidator = &nameMapperValidator{
@@ -41,17 +29,6 @@ var _ = Describe("Describe Cmd", func() {
 			},
 		}
 		cmd.NameMapper = mapValidator
-
-		cfgIoSpy = &clientConfigIoSpy{
-			LoadReturn: TestingConfig,
-		}
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
-		}
-
-		outBuffer = bytes.NewBufferString("")
-
-		cmd.RootCmd.SetOut(outBuffer)
 	})
 
 	Context("mod", func() {
@@ -78,7 +55,7 @@ var _ = Describe("Describe Cmd", func() {
 
 			cmd.RootCmd.SetArgs([]string{"describe", "mod", m.CliName})
 
-			executeAndVerifyOutput(outBuffer, expectedOutput, true)
+			executeAndVerifyOutput(td.outBuffer, expectedOutput, true)
 		})
 	})
 
@@ -109,7 +86,7 @@ var _ = Describe("Describe Cmd", func() {
 
 			cmd.RootCmd.SetArgs([]string{"describe", "group", "required"})
 
-			executeAndVerifyOutput(outBuffer, m1.CliName+"\n"+m2.CliName, false)
+			executeAndVerifyOutput(td.outBuffer, m1.CliName+"\n"+m2.CliName, false)
 		})
 	})
 
@@ -137,7 +114,7 @@ var _ = Describe("Describe Cmd", func() {
 
 			cmd.RootCmd.SetArgs([]string{"describe", "install", TestingClientMod1.CliName})
 
-			executeAndVerifyOutput(outBuffer, expectedOutput, true)
+			executeAndVerifyOutput(td.outBuffer, expectedOutput, true)
 		})
 
 		It("informs when not installed", func() {
@@ -145,7 +122,7 @@ var _ = Describe("Describe Cmd", func() {
 
 			cmd.RootCmd.SetArgs([]string{"describe", "install", TestingServerOnly1.CliName})
 
-			executeAndVerifyOutput(outBuffer, expectedOutput, true)
+			executeAndVerifyOutput(td.outBuffer, expectedOutput, true)
 		})
 	})
 
