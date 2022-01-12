@@ -2,29 +2,18 @@ package cmd_test
 
 import (
 	"mcmods/cmd"
-	"mcmods/mc"
 	. "mcmods/testdata"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/afero"
 )
 
 var _ = Describe("Visit Cmd", func() {
-	var fs afero.Fs
-	var launcher *spyLauncher
 	var mapValidator *nameMapperValidator
-	var cfgIoSpy *clientConfigIoSpy
+	var launcher *spyLauncher
 
 	BeforeEach(func() {
-		InitTestData()
-		mc.ServerGroups = TestingServerGroups
-		fs = afero.NewMemMapFs()
-		cmd.ViperInstance.SetFs(fs)
-
-		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
-			return mc.LocalFileSystem{Fs: fs}, nil
-		}
+		rootCmdTestSetup()
 
 		mapb := false
 		mapValidator = &nameMapperValidator{
@@ -35,13 +24,6 @@ var _ = Describe("Visit Cmd", func() {
 			},
 		}
 		cmd.NameMapper = mapValidator
-
-		cfgIoSpy = &clientConfigIoSpy{
-			LoadReturn: TestingConfig,
-		}
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
-		}
 
 		launcher = &spyLauncher{}
 		cmd.BrowserLauncher = launcher

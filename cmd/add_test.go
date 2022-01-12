@@ -12,14 +12,11 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/afero"
 )
 
 var _ = Describe("Add Cmd", func() {
-	var fs mc.FileSystem
-
+	var td *rootTestData
 	var mapValidator *nameMapperValidator
-	var cfgIoSpy *clientConfigIoSpy
 	var friendlyNoOp *noOpPrompt
 	var cliNameNoOp *noOpPrompt
 	var descNoOp *noOpPrompt
@@ -31,14 +28,7 @@ var _ = Describe("Add Cmd", func() {
 	groupName := "optional"
 
 	BeforeEach(func() {
-		InitTestData()
-		mc.ServerGroups = TestingServerGroups
-
-		afs := afero.NewMemMapFs()
-		fs = &mc.LocalFileSystem{Fs: afs}
-
-		cmd.ViperInstance.SetFs(afs)
-		cmd.ResetVars()
+		td = rootCmdTestSetup()
 
 		mapb := false
 		mapValidator = &nameMapperValidator{
@@ -50,20 +40,11 @@ var _ = Describe("Add Cmd", func() {
 		}
 		cmd.NameMapper = mapValidator
 
-		b := false
-		cfgIoSpy = &clientConfigIoSpy{
-			Saved:      &b,
-			LoadReturn: TestingConfig,
-		}
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
-		}
-
 		serverAddSaveFake = &serverAddSaveNoOp{}
 
 		cmd.ServerCfgSaver = serverAddSaveFake
 		cmd.CreateFsFunc = func(f *mc.FTPArgs) (mc.FileSystem, error) {
-			return fs, nil
+			return &mc.LocalFileSystem{Fs: td.fs}, nil
 		}
 
 		friendlyNoOp = &noOpPrompt{}

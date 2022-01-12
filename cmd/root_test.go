@@ -13,31 +13,10 @@ import (
 )
 
 var _ = Describe("Describe Cmd", func() {
-	var fs afero.Fs
-	var outBuffer *bytes.Buffer
-
-	var cfgIoSpy *clientConfigIoSpy
+	var td *rootTestData
 
 	BeforeEach(func() {
-		cmd.ResetVars()
-
-		fs = afero.NewMemMapFs()
-		mc.ServerGroups = TestingServerGroups
-
-		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
-			return mc.LocalFileSystem{Fs: fs}, nil
-		}
-
-		cfgIoSpy = &clientConfigIoSpy{
-			LoadReturn: TestingConfig,
-		}
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
-		}
-
-		outBuffer = bytes.NewBufferString("")
-
-		cmd.RootCmd.SetOut(outBuffer)
+		td = rootCmdTestSetup()
 	})
 
 	Context("FTP", func() {
@@ -69,7 +48,7 @@ var _ = Describe("Describe Cmd", func() {
 				Expect(ftpArgs.User).To(Equal(expectedUsername))
 				Expect(ftpArgs.Pw).To(Equal(expectedPassword))
 				Expect(ftpArgs.Server).To(Equal(expectedServer))
-				return mc.LocalFileSystem{Fs: fs}, nil
+				return mc.LocalFileSystem{Fs: td.fs}, nil
 			}
 
 			err := cmd.RootCmd.Execute()
@@ -78,3 +57,41 @@ var _ = Describe("Describe Cmd", func() {
 		})
 	})
 })
+
+func rootCmdTestSetup() *rootTestData {
+	cmd.ResetVars()
+
+	InitTestData()
+
+	b := false
+	rootData := &rootTestData{
+		fs:        afero.NewMemMapFs(),
+		outBuffer: bytes.NewBufferString(""),
+		cfgIoSpy: &clientConfigIoSpy{
+			Saved:      &b,
+			LoadReturn: TestingConfig,
+		},
+	}
+
+	cmd.ViperInstance.SetFs(rootData.fs)
+
+	mc.ServerGroups = TestingServerGroups
+
+	cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
+		return mc.LocalFileSystem{Fs: rootData.fs}, nil
+	}
+
+	cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
+		return rootData.cfgIoSpy
+	}
+
+	cmd.RootCmd.SetOut(rootData.outBuffer)
+
+	return rootData
+}
+
+type rootTestData struct {
+	fs        afero.Fs
+	outBuffer *bytes.Buffer
+	cfgIoSpy  *clientConfigIoSpy
+}

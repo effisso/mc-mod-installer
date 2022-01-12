@@ -9,7 +9,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/spf13/afero"
 )
 
 func TestCmds(t *testing.T) {
@@ -18,34 +17,15 @@ func TestCmds(t *testing.T) {
 }
 
 var _ = Describe("Install Cmd", func() {
-	var fs afero.Fs
-	var cfgIoSpy *clientConfigIoSpy
+	var td *rootTestData
 	var dl mc.ModDownloader
 
 	BeforeEach(func() {
-		InitTestData()
-		mc.ServerGroups = TestingServerGroups
-		cmd.ResetVars()
-		fs = afero.NewMemMapFs()
-		cmd.ViperInstance.SetFs(fs)
-
-		cmd.CreateFsFunc = func(ftpArgs *mc.FTPArgs) (mc.FileSystem, error) {
-			return mc.LocalFileSystem{Fs: fs}, nil
-		}
-
-		b := false
-		cfgIoSpy = &clientConfigIoSpy{
-			Saved:      &b,
-			LoadReturn: TestingConfig,
-		}
+		td = rootCmdTestSetup()
 
 		dl = &fakeDownloader{}
 		cmd.CreateDownloaderFunc = func(fs mc.FileSystem) mc.ModDownloader {
 			return dl
-		}
-
-		cmd.ConfigIoFunc = func(f mc.FileSystem) mc.ModConfigIo {
-			return cfgIoSpy
 		}
 	})
 
@@ -95,7 +75,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoSpy.Saved).To(BeTrue())
+				Expect(*td.cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -108,7 +88,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoSpy.Saved).To(BeTrue())
+				Expect(*td.cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -122,7 +102,7 @@ var _ = Describe("Install Cmd", func() {
 				Expect(err).To(BeNil(), "no error should have been returned")
 				Expect(*verifyFilter.Visited).To(BeTrue(), "mods not filtered")
 				Expect(*verifyInstaller.Visited).To(BeTrue(), "mods not installed")
-				Expect(*cfgIoSpy.Saved).To(BeTrue())
+				Expect(*td.cfgIoSpy.Saved).To(BeTrue())
 			})
 		})
 
@@ -145,11 +125,11 @@ var _ = Describe("Install Cmd", func() {
 		})
 
 		It("returns error from saving", func() {
-			cfgIoSpy.SaveErr = errors.New("save err")
+			td.cfgIoSpy.SaveErr = errors.New("save err")
 			cmd.RootCmd.SetArgs([]string{"install", "--full-server"})
 
 			err := cmd.RootCmd.Execute()
-			Expect(err).To(Equal(cfgIoSpy.SaveErr))
+			Expect(err).To(Equal(td.cfgIoSpy.SaveErr))
 		})
 	})
 	Context("client install", func() {
@@ -249,7 +229,7 @@ var _ = Describe("Install Cmd", func() {
 
 	Context("CreateDefaultDownloader", func() {
 		It("returns an initialized downloader", func() {
-			mcfs := mc.LocalFileSystem{Fs: fs}
+			mcfs := mc.LocalFileSystem{Fs: td.fs}
 			dl := cmd.CreateDefaultDownloader(mcfs)
 
 			Expect(dl).ToNot(BeNil())
