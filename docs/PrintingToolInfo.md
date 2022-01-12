@@ -52,4 +52,8 @@ All of the filters can be used in conjunction. Below are several examples of the
 
 ## Describe Mod
 
-Additional details about each mod are available by calling `mcmods describe mod x` where x is the mod CLI name
+Additional details about each mod are available by calling `mcmods describe mod x` where `x` is the mod CLI name
+
+## Describe Mod Install
+
+Print the details of a mod's installation metadata: `mcmods describe installation x` where `x` is the mod CLI name

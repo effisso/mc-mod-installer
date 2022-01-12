@@ -2,26 +2,26 @@
 
 The following sections demonstrate how to get started with the tool if followed in order.
 
-## Installing {{TBD MOD LOADER}} Mod Framework
+## Installing the Fabric Mod Framework
 
-Clients connecting to YAMS must use install a separate mod framework on their machine. This framework must match the server for mod compatibility. Without the proper framework or mods, the connection will not be allowed, or will be unstable.
+Clients connecting to YAMS must install the Fabric mod framework on their machine. 
 
-TODO
+The install is very easy, follow the guide on [Fabric's website](https://fabricmc.net/). Once complete, come back here and resume.
 
 ## Downloading and Installing the Mod Tool
 
-To help maintain mods and remove the burden of manually updating things, this tool was created to automate the installation of mods. Head over to the [Releases page](https://github.com/effisso/mc-mod-installer/releases) and download the latest version of the tool.
+To help maintain mods and remove the burden of manually updating them, this tool was created to automate the installation of mods. Head over to the [Releases page](https://github.com/effisso/mc-mod-installer/releases) and download the latest version of the tool.
 
-Unzip the contained application executable into your preferred location on your machine. A few suggestions:
-* Somewhere on the computer's PATH, so the command can be run from anywhere
-* Directly in your Minecraft installation folder, so it's easy to remember where it is
+Unzip the contained application executable into your preferred location on your machine. A few ideas:
+* Somewhere on the computer's PATH
+* Directly in your Minecraft installation folder
 * Use a combination of both of the above by adding the Minecraft install location to your PATH to get the best of both worlds
 
 ## Verifying the Tool Works
 
 Open a new command prompt/terminal instance. If your executable is NOT somewhere in the PATH, [navigate the terminal's working directory](https://www.minitool.com/news/how-to-change-directory-in-cmd.html) to the folder where the executable was unzipped.
 
-Type `mcmods version` into the terminal and hit enter. Verify that some version string is printed (e.g. 0.1.23). That number should match the number of the release downloaded earlier.
+Type `mcmods version` into the terminal and hit enter. Verify that some version string is printed (e.g. `0.1.23`). That number should match the number of the release downloaded earlier.
 
 ## Configuring the Minecraft Install Location
 
