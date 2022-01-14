@@ -4,7 +4,7 @@ BINARY_NAME=mcmods
 all: build test
 
 build:
-	go build -o ${BINARY_NAME} main.go
+	go build -o ${OUT_FOLDER}/${BINARY_NAME} main.go
 
 build-test-release: build-all-targets test zip
 
