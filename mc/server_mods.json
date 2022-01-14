@@ -8,12 +8,76 @@
 				"description": "Sleeping heals players, and removes potion effects",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/bed-benefits-fabric",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/bed-benefits-fabric/download/3543797/file"
+			},
+			{
+				"friendlyName": "Carpet",
+				"cliName": "carpet",
+				"description": "Dozens of small Vanila+ tweaks and bug fixes. Great foundation for technical players. Use the tick warp/freeze/step commands to speed-test farms and debug redstone in single player.",
+				"detailsUrl": "https://github.com/gnembon/fabric-carpet/wiki",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/carpet/download/3542018/file"
+			},
+			{
+				"friendlyName": "Couplings",
+				"cliName": "couplings",
+				"description": "Adjacent doors open and close together if either one is activated",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/couplings",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/couplings/download/3554499/file"
+			},
+			{
+				"friendlyName": "Carpet Extra",
+				"cliName": "carpet-extra",
+				"description": "A few more additions to Carpet's plethora of configurable settings.",
+				"detailsUrl": "https://github.com/gnembon/carpet-extra",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/carpet-extra/download/3542068/file"
 			}
 		]
 	},
 	"performance": {
 		"description": "Mods that are not required, but are recommended for general performance improvements. Their default configuration should be fine for those not wishing to configure things.",
-		"mods": []
+		"mods": [
+			{
+				"friendlyName": "Sodium",
+				"cliName": "sodium",
+				"description": "Rendering engine replacement that greatly improves frame rates and fixes other graphical issues",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium/download/3605309/file"
+			},
+			{
+				"friendlyName": "Continuity",
+				"cliName": "continuity",
+				"description": "Glass and other \"connected\" textures render with edges appropriately missing between adjacent blocks",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/continuity",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/continuity/download/3549420/file"
+			},
+			{
+				"friendlyName": "Lithium",
+				"cliName": "lithium",
+				"description": "General-purpose optimization mod to improve physics, mob ai, block ticking, etc without changing any vanilla behavior",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/lithium",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/lithium/download/3590908/file"
+			},
+			{
+				"friendlyName": "Indium",
+				"cliName": "indium",
+				"description": "Addon for Sodium to fix advanced rendering techniques used by some mods",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/indium",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/indium/download/3542434/file"
+			},
+			{
+				"friendlyName": "Phosphor",
+				"cliName": "phosphor",
+				"description": "Heavy optimizations to Minecraft's lighting engine",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/phosphor",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/phosphor/download/3573395/file"
+			},
+			{
+				"friendlyName": "Fast Furnace",
+				"cliName": "fast-furnace",
+				"description": "Optimization for the way the furnace block's recipe lookup works. Provides no functional difference.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/fast-furnace-for-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/fast-furnace-for-fabric/download/3558448/file"
+			}
+		]
 	},
 	"required": {
 		"description": "Mods that are required for clients to play on the server.",
@@ -24,11 +88,68 @@
 				"description": "Transport items between entity blocks with significantly better performance than hopper chains.",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/ducts",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/ducts/download/3571121/file"
+			},
+			{
+				"friendlyName": "Adorn",
+				"cliName": "adorn",
+				"description": "Furniture and decoration mod",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/adorn",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/adorn/download/3584469/file"
+			},
+			{
+				"friendlyName": "Fabric Language Kotlin",
+				"cliName": "kotlin-lib",
+				"description": "Library used by mods written in the Kotlin programming language. No functionality by itself.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin/download/3573712/file"
+			},
+			{
+				"friendlyName": "Fabric API",
+				"cliName": "fabric",
+				"description": "Core library for the most common hooks in the Fabric toolchain. Used by many mods.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-api",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-api/download/3595229/file"
 			}
 		]
 	},
 	"server-only": {
 		"description": "Mods that should only be installed on the server. These don't make sense to be installed on client machines.",
-		"mods": []
+		"mods": [
+			{
+				"friendlyName": "Respawning Shulkers",
+				"cliName": "respawn-shulkers",
+				"description": "Shulkers respawn in End Cities",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric/download/3542139/file"
+			},
+			{
+				"friendlyName": "Collective (Library)",
+				"cliName": "collective",
+				"description": "Library needed by a few mods. No functionality by itself.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/collective-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/collective-fabric/download/3568581/file"
+			},
+			{
+				"friendlyName": "DynMap",
+				"cliName": "dynmap",
+				"description": "Server-side mod which provides a browser-based interactive map",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/dynmapforge",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/dynmapforge/download/3581219/file"
+			},
+			{
+				"friendlyName": "Repurposed Structures",
+				"cliName": "repurp-structs",
+				"description": "Tons of variants/modifications on Vanilla structures found throughout the world. Friendly and hostile locations.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/repurposed-structures-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/repurposed-structures-fabric/download/3591436/file"
+			},
+			{
+				"friendlyName": "Cloth Config API",
+				"cliName": "cloth-config",
+				"description": "Library used by a few mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config/download/3559638/file"
+			}
+		]
 	}
 }
