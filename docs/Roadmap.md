@@ -6,7 +6,8 @@ This document captures intended/potential additions to the tool. Nothing is guar
     * Needed for at least latest download URL
 * Uninstall/Remove for mods/definitions
     * Specifically client-only mods
-* Dry run (at least for intstall)?
+* Dry run (at least for intstall)
+* Secure password prompt instead of command line arg for FTP password
 
 Potential Tech Debt Problems:
 
