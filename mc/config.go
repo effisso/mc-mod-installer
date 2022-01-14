@@ -3,8 +3,11 @@ package mc
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/afero"
 )
 
 const (
@@ -85,8 +88,36 @@ type ServerConfigSaver interface {
 	Save() error
 }
 
-type serverConfigSaver struct{}
+type serverConfigSaver struct {
+	Afs afero.Fs
+}
+
+// NewServerConfigSaver creates a new implementation of the ServerConfigSaver
+// interface with the given afero FS
+func NewServerConfigSaver(fs afero.Fs) ServerConfigSaver {
+	return &serverConfigSaver{Afs: fs}
+}
 
 func (s serverConfigSaver) Save() error {
-	return nil
+	var b []byte
+	var exists bool
+
+	wd, err := os.Getwd()
+	b, err = json.MarshalIndent(ServerGroups, "", "\t")
+	if err != nil {
+		return err // not sure how to test :/
+	}
+
+	cfgPath := filepath.Join(wd, "mc", "server_mods.json")
+
+	exists, err = afero.Exists(s.Afs, cfgPath)
+	if !exists {
+		err = errors.New("adding server mods is only allowed when working from the root of the tool's code repo")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return afero.WriteFile(s.Afs, cfgPath, b, 0644)
 }

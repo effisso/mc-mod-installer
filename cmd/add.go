@@ -4,6 +4,7 @@ import (
 	"mcmods/input"
 	"mcmods/mc"
 
+	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +40,7 @@ var (
 	GroupPrompt input.Prompt
 
 	// ServerCfgSaver saves the server config (for building new versions of this tool)
-	ServerCfgSaver mc.ServerConfigSaver
+	ServerCfgSaver mc.ServerConfigSaver = mc.NewServerConfigSaver(afero.NewOsFs())
 
 	serverMod *bool
 )
