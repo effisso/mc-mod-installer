@@ -40,7 +40,7 @@
 				"cliName": "sodium",
 				"description": "Rendering engine replacement that greatly improves frame rates and fixes other graphical issues",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium/download/3605309/file"
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium/download/3542074/file"
 			},
 			{
 				"friendlyName": "Continuity",
@@ -172,6 +172,20 @@
 				"description": "A trading post table which allows trading with all villagers in the area around it.",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric/download/3569713/file"
+			},
+			{
+				"friendlyName": "Forge Config API Fabric Port",
+				"cliName": "forge-config",
+				"description": "Configuration libarary used by some mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/download/3600918/file"
+			},
+			{
+				"friendlyName": "Puzzles Lib",
+				"cliName": "puzzles-lib",
+				"description": "Forge/Fabric abstraction libarary used by some mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/puzzles-lib-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/puzzles-lib-fabric/download/3583447/file"
 			}
 		]
 	},
