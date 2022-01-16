@@ -2,7 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      prerelease:
+        type: boolean
+        description: Whether or not this is a pre-release
 
 jobs:
   build:
@@ -20,7 +23,12 @@ jobs:
       run: make build-test-release
 
     - name: version
-      run: echo "::set-output name=version::$(cat VERSION.txt)"
+      run: |
+            SUFFIX=""
+            if (( ${{ github.event.inputs.prerelease }} )); then
+                SUFFIX="-prerelease-$(git rev-parse --short "$GITHUB_SHA")"
+            fi
+            echo "::set-output name=release-version::v$(cat VERSION.txt)$SUFFIX"
       id: version
     
     - name: release
@@ -28,9 +36,9 @@ jobs:
       id: create_release
       with:
         draft: false
-        prerelease: true
-        release_name: ${{ steps.version.outputs.version }}
-        tag_name: ${{ steps.version.outputs.version }}
+        prerelease: ${{ github.event.inputs.prerelease }}
+        release_name: ${{ steps.version.outputs.release-version }}
+        tag_name: ${{ steps.version.outputs.release-version }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
