@@ -12,8 +12,8 @@ build-all-targets:
 	env GOOS=windows GOARCH=amd64 go build -o ${OUT_FOLDER}/win/${BINARY_NAME}.exe main.go
 	@echo env GOOS=linux GOARCH=arm64 go build -o ${OUT_FOLDER}/linux-arm/${BINARY_NAME} main.go
 	@echo env GOOS=linux GOARCH=amd64 go build -o ${OUT_FOLDER}/linux-amd/${BINARY_NAME} main.go
-	@echo env GOOS=darwin GOARCH=arm64 go build -o ${OUT_FOLDER}/mac-arm/${BINARY_NAME} main.go
-	@echo env GOOS=darwin GOARCH=amd64 go build -o ${OUT_FOLDER}/mac-amd/${BINARY_NAME} main.go
+	env GOOS=darwin GOARCH=arm64 go build -o ${OUT_FOLDER}/darwin-arm/${BINARY_NAME} main.go
+	env GOOS=darwin GOARCH=amd64 go build -o ${OUT_FOLDER}/darwin-amd/${BINARY_NAME} main.go
 
 test:
 	go test -v ./...
@@ -42,8 +42,19 @@ get-ci-deps:
 	go install golang.org/x/lint/golint@latest
 
 zip:
-	zip -r ${OUT_FOLDER}/${BINARY_NAME}-windows.zip ${OUT_FOLDER}/win/${BINARY_NAME}.exe
-	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-arm.tar.gz ${OUT_FOLDER}/linux-arm/${BINARY_NAME}
-	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-linux-amd.tar.gz ${OUT_FOLDER}/linux-amd/${BINARY_NAME}
-	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-arm.tar.gz ${OUT_FOLDER}/mac-arm/${BINARY_NAME}
-	@echo tar -zcvf ${OUT_FOLDER}/${BINARY_NAME}-mac-amd.tar.gz ${OUT_FOLDER}/mac-amd/${BINARY_NAME}
+	filePrefix="$$(pwd)/${OUT_FOLDER}/${BINARY_NAME}" ;\
+	pushd ${OUT_FOLDER}/win ;\
+	zip -r "$$filePrefix-windows.zip" ${BINARY_NAME}.exe ;\
+	popd ;\
+	@echo pushd ${OUT_FOLDER}/linux-arm ;\
+	@echo tar -zcvf "$$filePrefix-linux-arm.tar.gz" ${BINARY_NAME} ;\
+	@echo popd ;\
+	@echo pushd ${OUT_FOLDER}/linux-amd ;\
+	@echo tar -zcvf "$$filePrefix-linux-amd.tar.gz" ${BINARY_NAME} ;\
+	@echo popd ;\
+	pushd ${OUT_FOLDER}/darwin-arm ;\
+	tar -zcvf "$$filePrefix-darwin-arm.tar.gz" ${BINARY_NAME} ;\
+	popd ;\
+	pushd ${OUT_FOLDER}/darwin-amd ;\
+	tar -zcvf "$$filePrefix-darwin-amd.tar.gz" ${BINARY_NAME} ;\
+	popd ;\

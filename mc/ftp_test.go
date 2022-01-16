@@ -214,6 +214,16 @@ var _ = Describe("FTP File System", func() {
 				Expect(err).To(BeNil())
 				Expect(called).To(BeFalse(), "MakeDir shoudn't be called on the root")
 			})
+
+			It("doesn't fail when the directory already exists", func() {
+				mock.MakeDirFunc = func(dir string) error {
+					return &textproto.Error{Code: ftp.StatusFileUnavailable}
+				}
+
+				err := ftpFs.MkDirAll("existing")
+
+				Expect(err).To(BeNil())
+			})
 		})
 
 		Context("Close", func() {

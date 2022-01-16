@@ -2,7 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      prerelease:
+        type: boolean
+        description: Whether or not this is a pre-release
 
 jobs:
   build:
@@ -20,7 +23,12 @@ jobs:
       run: make build-test-release
 
     - name: version
-      run: echo "::set-output name=version::$(cat VERSION.txt)"
+      run: |
+            SUFFIX=""
+            if (( ${{ github.event.inputs.prerelease }} )); then
+                SUFFIX="-prerelease-$(git rev-parse --short "$GITHUB_SHA")"
+            fi
+            echo "::set-output name=release-version::v$(cat VERSION.txt)$SUFFIX"
       id: version
     
     - name: release
@@ -28,9 +36,9 @@ jobs:
       id: create_release
       with:
         draft: false
-        prerelease: true
-        release_name: ${{ steps.version.outputs.version }}
-        tag_name: ${{ steps.version.outputs.version }}
+        prerelease: ${{ github.event.inputs.prerelease }}
+        release_name: ${{ steps.version.outputs.release-version }}
+        tag_name: ${{ steps.version.outputs.release-version }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
@@ -54,25 +62,25 @@ jobs:
     #     asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
     #     asset_content_type: application/gzip
 
-    # - name: upload mac arm
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ github.token }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: ./out/mcmods-mac-arm.tar.gz
-    #     asset_name: mcmods-mac-arm-${{ steps.version.outputs.version }}.tar.gz
-    #     asset_content_type: application/gzip
+    - name: upload darwin arm
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-darwin-arm.tar.gz
+        asset_name: mcmods-darwin-arm-${{ steps.version.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
 
-    # - name: upload mac amd
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ github.token }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-    #     asset_path: ./out/mcmods-mac-amd.tar.gz
-    #     asset_name: mcmods-mac-amd-${{ steps.version.outputs.version }}.tar.gz
-    #     asset_content_type: application/gzip
+    - name: upload darwin amd
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./out/mcmods-darwin-amd.tar.gz
+        asset_name: mcmods-darwin-amd-${{ steps.version.outputs.version }}.tar.gz
+        asset_content_type: application/gzip
 
     - name: upload windows
       uses: actions/upload-release-asset@v1

@@ -5,9 +5,10 @@ This document captures intended/potential additions to the tool. Nothing is guar
 * Update specific fields for mod definitions
     * Needed for at least latest download URL
 * Uninstall/Remove for mods/definitions
-    * Specifically client-only mods
+    * Client-only and server mods
 * Dry run (at least for intstall)
 * Secure password prompt instead of command line arg for FTP password
+* Self-update command
 
 Potential Tech Debt Problems:
 
