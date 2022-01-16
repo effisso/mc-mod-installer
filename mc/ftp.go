@@ -56,8 +56,14 @@ func (f FTPFileSystem) ReadFile(relPath string) ([]byte, error) {
 
 // MkDirAll creates all non-existant folders in the given path.
 func (f FTPFileSystem) MkDirAll(relPath string) error {
+	protoErr := &textproto.Error{}
 	for _, dir := range GetRecursiveDirs(fixPathForFTP(relPath)) {
 		if err := f.Connection.MakeDir(dir); err != nil {
+			if errors.As(err, &protoErr) {
+				if protoErr.Code == ftp.StatusFileUnavailable {
+					continue
+				}
+			}
 			return err
 		}
 	}
