@@ -27,7 +27,7 @@ jobs:
             filePrefix="$(pwd)/out/mcmods"
             cd out/win
             zip -r "$filePrefix-windows.zip" mcmods.exe
-            @echo ../cd linux-arm
+            @echo cd ../linux-arm
             @echo tar -zcvf "$filePrefix-linux-arm.tar.gz" mcmods
             @echo cd ../linux-amd
             @echo tar -zcvf "$filePrefix-linux-amd.tar.gz" mcmods
