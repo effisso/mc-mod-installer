@@ -10,18 +10,18 @@
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/bed-benefits-fabric/download/3543797/file"
 			},
 			{
-				"friendlyName": "Carpet",
-				"cliName": "carpet",
-				"description": "Dozens of small Vanila+ tweaks and bug fixes. Great foundation for technical players. Use the tick warp/freeze/step commands to speed-test farms and debug redstone in single player.",
-				"detailsUrl": "https://github.com/gnembon/fabric-carpet/wiki",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/carpet/download/3542018/file"
-			},
-			{
 				"friendlyName": "Couplings",
 				"cliName": "couplings",
 				"description": "Adjacent doors open and close together if either one is activated",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/couplings",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/couplings/download/3554499/file"
+			},
+			{
+				"friendlyName": "Carpet",
+				"cliName": "carpet",
+				"description": "Dozens of small Vanila-spirited tweaks and bug fixes. Great foundation for technical players.",
+				"detailsUrl": "https://github.com/gnembon/fabric-carpet/wiki",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/carpet/download/3542018/file"
 			},
 			{
 				"friendlyName": "Carpet Extra",
@@ -109,6 +109,69 @@
 				"description": "Core library for the most common hooks in the Fabric toolchain. Used by many mods.",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-api",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/fabric-api/download/3595229/file"
+			},
+			{
+				"friendlyName": "Cloth Config API",
+				"cliName": "cloth-config",
+				"description": "Library used by a few mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config/download/3559638/file"
+			},
+			{
+				"friendlyName": "Automated Crafting",
+				"cliName": "automated-crafting",
+				"description": "Crafting automation using a new table block and redstone. Hopper/dropper inputs",
+				"detailsUrl": "https://gitlab.com/supersaiyansubtlety/automated_crafting/-/wikis/home",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/automated-crafting/download/3576378/file"
+			},
+			{
+				"friendlyName": "NiceMod - New Blocks",
+				"cliName": "nice-blocks",
+				"description": "Decorative blocks; stone columns/walls, wooden supports, fences, cannons.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/nicemod-new-blocks",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/nicemod-new-blocks/download/3603686/file"
+			},
+			{
+				"friendlyName": "More Villagers",
+				"cliName": "more-villagers",
+				"description": "Adds lots of new villager jobs, trades, and workstations.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/more-villagers-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/more-villagers-fabric/download/3606177/file"
+			},
+			{
+				"friendlyName": "Hookshot",
+				"cliName": "hookshot",
+				"description": "Adds an upgradable grappling hook tool.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/hookshot",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/hookshot/download/3541381/file"
+			},
+			{
+				"friendlyName": "Simple Shelves",
+				"cliName": "shelves",
+				"description": "Shelves which can be used to display items and books.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves/download/3569283/file"
+			},
+			{
+				"friendlyName": "Chunk Loaders",
+				"cliName": "chunk-loaders",
+				"description": "Several craftable chunk loaders with varying levels of power.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/chunk-loaders",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/chunk-loaders/download/3596581/file"
+			},
+			{
+				"friendlyName": "Expanded Basalt, Calcite, Dripstone, and Tuff",
+				"cliName": "bcdt-expansion",
+				"description": "Various block types for Basalt, Calcite, Dripstone, and Tuff for parity with other stone types. Includes smooth, bricks, stairs, tiles, slabs, etc.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/bcdt-expansion",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/bcdt-expansion/download/3543801/file"
+			},
+			{
+				"friendlyName": "Trading Post",
+				"cliName": "trading-post",
+				"description": "A trading post table which allows trading with all villagers in the area around it.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric/download/3569713/file"
 			}
 		]
 	},
@@ -144,11 +207,32 @@
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/repurposed-structures-fabric/download/3591436/file"
 			},
 			{
-				"friendlyName": "Cloth Config API",
-				"cliName": "cloth-config",
-				"description": "Library used by a few mods. No functionality on its own.",
-				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/cloth-config/download/3559638/file"
+				"friendlyName": "Stoneholm",
+				"cliName": "stoneholm",
+				"description": "Adds underground villages. Works in conjunction with the \"More Villagers\" mod.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/stoneholm",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/stoneholm/download/3561773/file"
+			},
+			{
+				"friendlyName": "Mo' Structures",
+				"cliName": "mo-structures",
+				"description": "Provides several interesting new friendly and hostile structures.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/mo-structures",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/mo-structures/download/3567077/file"
+			},
+			{
+				"friendlyName": "Towers of the Wild",
+				"cliName": "totw",
+				"description": "Towers reminicent of those in the \"Breath of the Wild\" Zelda title are added to world generation. No new blocks or functionality.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/towers-of-the-wild-reworked",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/towers-of-the-wild-reworked/download/3569598/file"
+			},
+			{
+				"friendlyName": "Terralith 2.0 ~ Overworld Evolved",
+				"cliName": "terralith",
+				"description": "Massive overhaul of terrain generation in the overworld. Works in conjunction with 1.18 changes, instead of as a replacement.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/terralith",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/terralith/download/3606078/file"
 			}
 		]
 	}
