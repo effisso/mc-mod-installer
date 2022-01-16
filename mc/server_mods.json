@@ -186,13 +186,6 @@
 		"description": "Mods that should only be installed on the server. These don't make sense to be installed on client machines.",
 		"mods": [
 			{
-				"friendlyName": "Respawning Shulkers",
-				"cliName": "respawn-shulkers",
-				"description": "Shulkers respawn in End Cities",
-				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric/download/3542139/file"
-			},
-			{
 				"friendlyName": "Collective (Library)",
 				"cliName": "collective",
 				"description": "Library needed by a few mods. No functionality by itself.",
