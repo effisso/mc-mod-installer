@@ -146,13 +146,6 @@
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/hookshot/download/3541381/file"
 			},
 			{
-				"friendlyName": "Simple Shelves",
-				"cliName": "shelves",
-				"description": "Shelves which can be used to display items and books.",
-				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves/download/3569283/file"
-			},
-			{
 				"friendlyName": "Chunk Loaders",
 				"cliName": "chunk-loaders",
 				"description": "Several craftable chunk loaders with varying levels of power.",
