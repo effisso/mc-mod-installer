@@ -5,7 +5,7 @@ on:
     inputs:
       prerelease:
         type: boolean
-        description: Whether or not this is a pre-release
+        description: This is a pre-release
 
 jobs:
   build:
