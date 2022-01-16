@@ -6,7 +6,7 @@ all: build test
 build:
 	go build -o ${OUT_FOLDER}/${BINARY_NAME} main.go
 
-build-test-release: build-all-targets test zip
+build-test-release: build-all-targets test
 
 build-all-targets:
 	env GOOS=windows GOARCH=amd64 go build -o ${OUT_FOLDER}/win/${BINARY_NAME}.exe main.go
@@ -40,21 +40,3 @@ clean:
 get-ci-deps:
 	sudo apt-get install -y zip
 	go install golang.org/x/lint/golint@latest
-
-zip:
-	filePrefix="$$(pwd)/${OUT_FOLDER}/${BINARY_NAME}" ;\
-	pushd ${OUT_FOLDER}/win ;\
-	zip -r "$$filePrefix-windows.zip" ${BINARY_NAME}.exe ;\
-	popd ;\
-	@echo pushd ${OUT_FOLDER}/linux-arm ;\
-	@echo tar -zcvf "$$filePrefix-linux-arm.tar.gz" ${BINARY_NAME} ;\
-	@echo popd ;\
-	@echo pushd ${OUT_FOLDER}/linux-amd ;\
-	@echo tar -zcvf "$$filePrefix-linux-amd.tar.gz" ${BINARY_NAME} ;\
-	@echo popd ;\
-	pushd ${OUT_FOLDER}/darwin-arm ;\
-	tar -zcvf "$$filePrefix-darwin-arm.tar.gz" ${BINARY_NAME} ;\
-	popd ;\
-	pushd ${OUT_FOLDER}/darwin-amd ;\
-	tar -zcvf "$$filePrefix-darwin-amd.tar.gz" ${BINARY_NAME} ;\
-	popd ;\
