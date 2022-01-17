@@ -18,10 +18,10 @@ To make sure that the tool can correctly download the mod JAR, use the following
 
 From the mod's homepage, click the `Files` tab. Find the correct version of the mod that corresponsds to the server configuration (Fabric installer, MC version) and click the download link.
 
-![recent files](/RecentFilesView.png)
+![recent files](/docs/RecentFilesView.png)
 
 A new page will open that attempts to start the download. This can be canceled, and instead, copy the link from the `here` anchor as shown below
 
-![copy link](/CopyLink.png)
+![copy link](/docs/CopyLink.png)
 
 This link can be pasted into the tool for the `Package Download URL` field of the new mod.

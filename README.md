@@ -11,5 +11,5 @@ Topics about the tool's usage are further documented in the [docs folder](https:
 * [Server Details](https://github.com/effisso/mc-mod-installer/tree/main/docs/YAMSDetails.md)
 * [Quick Start](https://github.com/effisso/mc-mod-installer/tree/main/docs/QuickStart.md)
 * [Installing Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/InstallingMods.md)
-* [Adding Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md)
+* [Adding Custom Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md)
 * [Printing Tool Info](https://github.com/effisso/mc-mod-installer/tree/main/docs/PrintingToolInfo.md)
