@@ -8,7 +8,8 @@ This tool is used to install and maintain Minecraft mods for the CDP YAMS server
 ## Using the Tool
 Topics about the tool's usage are further documented in the [docs folder](https://github.com/effisso/mc-mod-installer/tree/main/docs):
 
+* [Server Details](https://github.com/effisso/mc-mod-installer/tree/main/docs/YAMSDetails.md)
 * [Quick Start](https://github.com/effisso/mc-mod-installer/tree/main/docs/QuickStart.md)
 * [Installing Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/InstallingMods.md)
-* [Adding Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingMods.md)
+* [Adding Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md)
 * [Printing Tool Info](https://github.com/effisso/mc-mod-installer/tree/main/docs/PrintingToolInfo.md)
