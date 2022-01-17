@@ -13,7 +13,7 @@ The install command is used for initially installing as well as updating mods. T
     * **performance** - optional mods that can be installed for performance boosts and many types of optimizations in Minecraft
     * **optional** - other mods installed on the server that are not necessary on the client, but can be installed, and recommended for client-side responsiveness to server events
 
-To add client-only mods to the tool's configuration, see [Adding Client Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingClientMods.md).
+To add client-only mods to the tool's configuration, see [Adding Custom Mods](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md).
 
 ## Command Arguments
 
