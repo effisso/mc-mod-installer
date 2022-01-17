@@ -15,7 +15,6 @@ Mod Loader: [Fabric](https://fabricmc.net/)
 * The server has an in-browser, interactive map mod hosted on the same IP with a different port. See the pinned message in the #general channel of the CDP Discord Server for the IP and port
 * Carpet Mod is used to provide many small vanilla-friendly, reversable tweaks to the server. At the time of writing, here's what we use (and the [full list of options with descriptions](https://github.com/gnembon/fabric-carpet/wiki/Current-Available-Settings)):
     * fastRedstoneDust true
-    * combineXPOrbs true
     * leadFix true
     * antiCheatDisabled true
     * persistentParrots true
@@ -38,6 +37,5 @@ Mod Loader: [Fabric](https://fabricmc.net/)
     * spawnChunksSize 0
     * stackableShulkerBoxes true
     * And a few from [carpet-extra](https://github.com/gnembon/carpet-extra)
-        * comparatorBetterItemFrames true
         * dispensersFeedAnimals true
         * renewableSand true
