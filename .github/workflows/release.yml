@@ -35,7 +35,7 @@ jobs:
     - name: version
       run: |
             SUFFIX=""
-            if (( ${{ github.event.inputs.prerelease }} )); then
+            if ${{ github.event.inputs.prerelease }}; then
                 SUFFIX="-prerelease-$(git rev-parse --short "$GITHUB_SHA")"
             fi
             echo "::set-output name=release-version::v$(cat VERSION.txt)$SUFFIX"
