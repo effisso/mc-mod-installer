@@ -43,9 +43,15 @@ Users unfamiliar with configuring mods are encouraged to do a plain install
 with all the required and recommended mods. Simply run the install command with
 no arguments.
 
+IMPORTANT: Disconnect from VPN to avoid issues when downloading mods.
+
 For advanced users wanting to use a custom set of performance-related mods or
-those who simply don't want the optional mods on their machine, see the --help
-command to read about filtering.
+those who simply don't want the optional mods on their machine, see the argument
+descriptions for more about filtering out mods.
+
+--force can be used to invoke a download even if the latest version of the mods
+already exist locally. Otherwise, the tool skips if the latest URL matches the
+URL at the time of download.
 
 To perform a server install, use the --full-server option the FTP info:
   $ install --full-server --user <ftp-user> --password <pw> --server <server>
