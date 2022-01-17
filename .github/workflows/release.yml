@@ -27,11 +27,7 @@ jobs:
             filePrefix="$(pwd)/out/mcmods"
             cd out/win
             zip -r "$filePrefix-windows.zip" mcmods.exe
-            @echo cd ../linux-arm
-            @echo tar -zcvf "$filePrefix-linux-arm.tar.gz" mcmods
-            @echo cd ../linux-amd
-            @echo tar -zcvf "$filePrefix-linux-amd.tar.gz" mcmods
-            @echo cd ../darwin-arm
+            cd ../darwin-arm
             tar -zcvf "$filePrefix-darwin-arm.tar.gz" mcmods
             cd ../darwin-amd
             tar -zcvf "$filePrefix-darwin-amd.tar.gz" mcmods
@@ -63,7 +59,7 @@ jobs:
     #   with:
     #     upload_url: ${{ steps.create_release.outputs.upload_url }}
     #     asset_path: ./out/mcmods-linux-arm.tar.gz
-    #     asset_name: mcmods-linux-arm-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_name: mcmods-linux-arm-${{ steps.version.outputs.release-version }}.tar.gz
     #     asset_content_type: application/gzip
         
     # - name: upload linux amd
@@ -73,7 +69,7 @@ jobs:
     #   with:
     #     upload_url: ${{ steps.create_release.outputs.upload_url }}
     #     asset_path: ./out/mcmods-linux-amd.tar.gz
-    #     asset_name: mcmods-linux-amd-${{ steps.version.outputs.version }}.tar.gz
+    #     asset_name: mcmods-linux-amd-${{ steps.version.outputs.release-version }}.tar.gz
     #     asset_content_type: application/gzip
 
     - name: upload darwin arm
@@ -83,7 +79,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-darwin-arm.tar.gz
-        asset_name: mcmods-darwin-arm-${{ steps.version.outputs.version }}.tar.gz
+        asset_name: mcmods-darwin-arm-${{ steps.version.outputs.release-version }}.tar.gz
         asset_content_type: application/gzip
 
     - name: upload darwin amd
@@ -93,7 +89,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-darwin-amd.tar.gz
-        asset_name: mcmods-darwin-amd-${{ steps.version.outputs.version }}.tar.gz
+        asset_name: mcmods-darwin-amd-${{ steps.version.outputs.release-version }}.tar.gz
         asset_content_type: application/gzip
 
     - name: upload windows
@@ -103,5 +99,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./out/mcmods-windows.zip
-        asset_name: mcmods-windows-${{ steps.version.outputs.version }}.zip
+        asset_name: mcmods-windows-${{ steps.version.outputs.release-version }}.zip
         asset_content_type: application/zip
