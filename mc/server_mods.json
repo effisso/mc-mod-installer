@@ -40,7 +40,7 @@
 				"cliName": "sodium",
 				"description": "Rendering engine replacement that greatly improves frame rates and fixes other graphical issues",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium/download/3605309/file"
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/sodium/download/3542074/file"
 			},
 			{
 				"friendlyName": "Continuity",
@@ -146,13 +146,6 @@
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/hookshot/download/3541381/file"
 			},
 			{
-				"friendlyName": "Simple Shelves",
-				"cliName": "shelves",
-				"description": "Shelves which can be used to display items and books.",
-				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/simple-shelves/download/3569283/file"
-			},
-			{
 				"friendlyName": "Chunk Loaders",
 				"cliName": "chunk-loaders",
 				"description": "Several craftable chunk loaders with varying levels of power.",
@@ -172,19 +165,26 @@
 				"description": "A trading post table which allows trading with all villagers in the area around it.",
 				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric",
 				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/trading-post-fabric/download/3569713/file"
+			},
+			{
+				"friendlyName": "Forge Config API Fabric Port",
+				"cliName": "forge-config",
+				"description": "Configuration libarary used by some mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/download/3600918/file"
+			},
+			{
+				"friendlyName": "Puzzles Lib",
+				"cliName": "puzzles-lib",
+				"description": "Forge/Fabric abstraction libarary used by some mods. No functionality on its own.",
+				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/puzzles-lib-fabric",
+				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/puzzles-lib-fabric/download/3583447/file"
 			}
 		]
 	},
 	"server-only": {
 		"description": "Mods that should only be installed on the server. These don't make sense to be installed on client machines.",
 		"mods": [
-			{
-				"friendlyName": "Respawning Shulkers",
-				"cliName": "respawn-shulkers",
-				"description": "Shulkers respawn in End Cities",
-				"detailsUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric",
-				"latestUrl": "https://www.curseforge.com/minecraft/mc-mods/respawning-shulkers-fabric/download/3542139/file"
-			},
 			{
 				"friendlyName": "Collective (Library)",
 				"cliName": "collective",

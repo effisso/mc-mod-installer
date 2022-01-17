@@ -52,8 +52,16 @@ All of the filters can be used in conjunction. Below are several examples of the
 
 ## Describe Mod
 
-Additional details about each mod are available by calling `mcmods describe mod x` where `x` is the mod CLI name
+Additional details about each mod are available by calling `mcmods describe mod x` where `x` is the mod CLI name.
 
 ## Describe Mod Install
 
-Print the details of a mod's installation metadata: `mcmods describe installation x` where `x` is the mod CLI name
+Print the details of a mod's installation metadata: `mcmods describe installation x` where `x` is the mod CLI name.
+
+## Visiting a Mod's homepage/wiki
+
+To make learning accessing mod documentation easier, the tool can be used to quickly visit the main informational webpage about each mod. Just use the command `mcmods visit x` where `x` is the mod CLI name.
+
+## Accessing Tool Documentation
+
+`mcmods docs` will open up the main doc folder in a browser.

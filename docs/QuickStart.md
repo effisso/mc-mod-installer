@@ -10,9 +10,10 @@ The install is very easy, follow the guide on [Fabric's website](https://fabricm
 
 ## Downloading and Installing the Mod Tool
 
-To help maintain mods and remove the burden of manually updating them, this tool was created to automate the installation of mods. Head over to the [Releases page](https://github.com/effisso/mc-mod-installer/releases) and download the latest version of the tool.
+To help maintain mods and remove the burden of manually updating them, this tool was created to automate the installation of mods. Head over to the [Releases page](https://github.com/effisso/mc-mod-installer/releases) and download the latest release version of the tool.
 
 Unzip the contained application executable into your preferred location on your machine. A few ideas:
+
 * Somewhere on the computer's PATH
 * Directly in your Minecraft installation folder
 * Use a combination of both of the above by adding the Minecraft install location to your PATH to get the best of both worlds
@@ -35,10 +36,10 @@ You can use `mcmods mcpath` again to verify that the configuration was updated.
 
 ## Installing Mods
 
-Now the tool is ready to install mods! In order to play on the YAMS server, certain mods are required to be installed on the client This portion of the guide demonstrates a basic client install with no customizations or client-only mods. Further documentation about those advanced topics is available in the [docs folder](https://github.com/effisso/mc-mod-installer/tree/main/docs). Here, we will install all of the required mods, as well as some that offer performance boosts and bug fixes.
+Now the tool is ready to install mods! In order to play on the YAMS server, certain mods are required to be installed on the client This portion of the guide demonstrates a basic client install with no customizations or client-only mods. Further documentation about adding client-only mods is available in the [Adding Custom Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md); and information about excluding some optional server mods is found in the [Installing Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/InstallingMods.md). In this example, we will install all of the required mods, as well as all of the optional/recommended mods, which offer performance boosts, bug fixes, and general feature-responsiveness being on the client. Users wishing to do no further client mod customization should use this installation.
 
 Simply type `mcmods install` and wait for it to finish.
 
-That's it.
+## Connecting to YAMS
 
-With that, the machine should have all the mods installed in the correct location for the mod framework; no additional configuration required. Fire up Minecraft and head on over to YAMS.
+There is a pinned message in the Discord server with the IP/port information. Use that information to connect to the server.

@@ -19,17 +19,17 @@ To add client-only mods to the tool's configuration, see [Adding Client Mods](ht
 
 Brief descriptions of the arguments that can be used to customize the install
 
-* **--client-only** - only install the custom mods defined on this client machine
-* **--full-server** - do not use for a client install
-* **--force** - force the mod to be redownloaded and written to disk, even if the latest already exists on this machine
-* **--x-group** - exclude one or server groups by providing the group names after the flag; comma-separated
-* **--x-mod** - exclude any mod (client or server) from being installed by providing its CLI name following the flag; comma-separated
+* **--client-only** - only install the custom mods defined on this client machine.
+* **--full-server** - do not use for a client install.
+* **--force** - force the mod to be redownloaded and written to disk, even if the latest already exists on this machine, according to the tool config.
+* **--x-group** - exclude one or server groups by providing the group names after the flag; comma-separated.
+* **--x-mod** - exclude any mod (client or server) from being installed by providing its CLI name following the flag; comma-separated.
 
 ## Sample Commands
 
 * `mcmods install` installs all client mods, and all server mods, except the group server-only
 * `mcmods install --client-only` installs all custom client-only mods; no server mods
 * `mcmods install --client-only --x-mod somemod` excludes a mod from the client-only install
-* `mcmods install --x-group performance,optional` exclude the performance and optional server groups
+* `mcmods install --x-group performance,optional` exclude the performance and optional server groups (i.e. only install the required mods)
 
 **NOTE**: For all install commands that don't explicitly speciy the `--full-server` flag, the `server-only` group is always automatically excluded.
