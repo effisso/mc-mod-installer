@@ -36,9 +36,9 @@ You can use `mcmods mcpath` again to verify that the configuration was updated.
 
 ## Installing Mods
 
-Now the tool is ready to install mods! In order to play on the YAMS server, certain mods are required to be installed on the client This portion of the guide demonstrates a basic client install with no customizations or client-only mods. Further documentation about adding client-only mods is available in the [Adding Custom Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md); and information about excluding some optional server mods is found in the [Installing Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/InstallingMods.md). In this example, we will install all of the required mods, as well as all of the optional/recommended mods, which offer performance boosts, bug fixes, and general feature-responsiveness being on the client. Users wishing to do no further client mod customization should use this installation.
+Now the tool is ready to install mods! Before configuring any client-only mods on your machine, this version of the install will only install all of the required and recommended server mods. Further documentation about adding client-only mods is available in the [Adding Custom Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/AddingCustomMods.md); and information about excluding some optional server mods from the install can be found in the [Installing Mods doc](https://github.com/effisso/mc-mod-installer/tree/main/docs/InstallingMods.md).
 
-Simply type `mcmods install` and wait for it to finish.
+Simply use the command `mcmods install` and wait for it to finish.
 
 ## Connecting to YAMS
 
