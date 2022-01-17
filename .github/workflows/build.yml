@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - "**/*.md"
       - "**/*.png"
+      - ".github/workflows/release.yml"
 
 jobs:
   build:
