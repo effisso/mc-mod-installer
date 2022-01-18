@@ -33,6 +33,9 @@ var (
 
 	// ViperInstance - Shared instance of Viper for accessing config
 	ViperInstance = viper.GetViper()
+
+	// DefaultOsMinecraftDir is where Minecraft is expected to be installed
+	DefaultOsMinecraftDir string
 )
 
 func init() {

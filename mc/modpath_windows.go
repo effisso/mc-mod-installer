@@ -3,7 +3,12 @@
 
 package mc
 
-import "path/filepath"
+import (
+	"os"
+	"path/filepath"
+)
 
-// DefaultOsMinecraftDir is where Minecraft is expected to be installed
-var DefaultOsMinecraftDir = filepath.Join("%APPDATA%", ".minecraft")
+func init() {
+	cfgDir, _ := os.UserConfigDir()
+	DefaultOsMinecraftDir = filepath.Join(cfgDir, ".minecraft")
+}
